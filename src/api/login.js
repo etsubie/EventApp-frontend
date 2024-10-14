@@ -1,6 +1,6 @@
-const API_URL = '/api/register'; 
+const API_URL = '/api/login';
 
-export const registerUser = async (formData) => {
+export const loginUser = async (formData) => {
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
@@ -12,12 +12,13 @@ export const registerUser = async (formData) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Registration failed');
+      throw new Error(errorData.message || 'Login failed');
     }
 
     const data = await response.json();
     return data; 
   } catch (error) {
-    throw new Error(error.message);
+    console.error('Error during login:', error);
+    throw error;
   }
 };
