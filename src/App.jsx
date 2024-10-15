@@ -8,14 +8,20 @@ import { Register } from "./pages/Auth/Register";
 import { Login } from "./pages/Auth/Login";
 import PrivateRoute from "./Context/PrivateRoute/PrivateRoute";
 import { Navigation } from "./components/common/Navigation";
+import { UserForm } from "./pages/UserFrom";
+import { useContext } from "react";
+import { AuthContext } from "./Context/AuthContext";
+import { ToastProvider } from "./Context/TostContext";
 
 function App() {
+  const { user } = useContext(AuthContext);
   return (
-    <BrowserRouter>
-    <Navigation/>
+    <ToastProvider>
+      <BrowserRouter>
+      <Navigation />
       <div className="flex  bg-gray-900 text-gray-100 h-screen overflow-hidden">
-        <Sidebar />
-        <Routes>
+      {user && user.role === "admin" && <Sidebar />}
+      <Routes>
           {/* routes for all */}
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
@@ -35,6 +41,14 @@ function App() {
             element={
               <PrivateRoute role="admin">
                 <UsersPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/users/:id"
+            element={
+              <PrivateRoute role="admin">
+                <UserForm />
               </PrivateRoute>
             }
           />
@@ -61,6 +75,7 @@ function App() {
         </Routes>
       </div>
     </BrowserRouter>
+    </ToastProvider>
   );
 }
 

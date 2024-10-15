@@ -1,36 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { fetchUsers } from "../../api/admin";
+import { fetchUsers } from "../../api/users"; 
+import { Link } from "react-router-dom";
+import { useToast } from "../../Context/TostContext"; 
 
 const UsersTable = () => {
-  const [users, setUsers] = useState([]);  // Start with an empty array
+  const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const addToast = useToast(); 
 
   useEffect(() => {
     const getUsers = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchUsers();
+        const data = await fetchUsers(); 
         if (Array.isArray(data)) {
           setUsers(data);
-          setOriginalUsers(data); // Save original data
+          setOriginalUsers(data);
         } else {
-          setError("Unexpected data format from server.");
-          console.error("Expected an array but received:", data);
+          throw new Error("Unexpected data format from server.");
         }
       } catch (error) {
         setError("Failed to fetch users. Please try again later.");
-        console.error(error);
+        addToast("Failed to fetch users. Please try again later.", "error");
       } finally {
         setLoading(false);
       }
     };
-    getUsers();
-  }, []);
+
+    getUsers(); // Fetch users on component mount
+  }, [addToast]);
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -42,13 +45,12 @@ const UsersTable = () => {
     );
     setUsers(filtered);
   };
-
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>; 
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div>{error}</div>; 
   }
 
   return (
@@ -70,7 +72,6 @@ const UsersTable = () => {
           />
         </div>
       </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
@@ -111,7 +112,7 @@ const UsersTable = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    <button className="text-indigo-400 hover:text-indigo-300 mr-2">Edit</button>
+                    <Link to={`/admin/users/${user.id}`} className="text-indigo-400 hover:text-indigo-300 mr-2">Edit</Link>
                     <button className="text-red-400 hover:text-red-300">Delete</button>
                   </td>
                 </motion.tr>

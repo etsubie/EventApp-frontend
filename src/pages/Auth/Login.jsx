@@ -23,7 +23,6 @@ export function Login() {
       localStorage.setItem("token", data.token);
       setToken(data.token);
       clearForm();
-      console.log(data.role);
       if (data.role === "admin") {
         navigate("/admin/overview");
       } else if (data.role === "host") {
