@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { fetchUsers } from "../../api/users"; 
 import { Link } from "react-router-dom";
 import { useToast } from "../../Context/TostContext"; 
+import { deleteUserapi } from "../../api/users";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
@@ -25,7 +26,6 @@ const UsersTable = () => {
           throw new Error("Unexpected data format from server.");
         }
       } catch (error) {
-        setError("Failed to fetch users. Please try again later.");
         addToast("Failed to fetch users. Please try again later.", "error");
       } finally {
         setLoading(false);
@@ -45,6 +45,17 @@ const UsersTable = () => {
     );
     setUsers(filtered);
   };
+
+  const handleDelete = async (userId) => {
+    try {
+      await deleteUserapi(userId); 
+      setUsers((prev) => prev.filter((user) => user.id !== userId));
+      addToast("User deleted successfully!", "success");
+    } catch (error) {
+      addToast("Failed to delete user. Please try again.", "error");
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>; 
   }
@@ -113,7 +124,7 @@ const UsersTable = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <Link to={`/admin/users/${user.id}`} className="text-indigo-400 hover:text-indigo-300 mr-2">Edit</Link>
-                    <button className="text-red-400 hover:text-red-300">Delete</button>
+                    <button onClick={() => handleDelete(user.id)} className="text-red-400 hover:text-red-300">Delete</button>
                   </td>
                 </motion.tr>
               ))

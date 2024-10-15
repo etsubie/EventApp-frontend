@@ -66,6 +66,29 @@ export const updateUserapi = async (id, formData) => {
   }
 };
 
+//delete a user
+export const deleteUserapi = async (id, formData) => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Something went wrong");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("API error:", error.message);
+    throw error;
+  }
+};
+
 // Fetch user growth data
 export const fetchUserGrowthData = async () => {
   try {
