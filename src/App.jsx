@@ -1,7 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Sidebar from "./components/common/Sidebar";
 import OverviewPage from "./pages/admin/OverviewPage";
-import ProductsPage from "./pages/admin/ProductsPage";
 import UsersPage from "./pages/admin/UsersPage";
 import Home from "./pages/Home";
 import { Register } from "./pages/Auth/Register";
@@ -12,6 +11,8 @@ import { UserForm } from "./pages/UserFrom";
 import { useContext } from "react";
 import { AuthContext } from "./Context/AuthContext";
 import { ToastProvider } from "./Context/TostContext";
+import EventsPage from "./pages/EventsPage";
+import EventDetailsPage from "./pages/EventDetailsPage";
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -19,14 +20,14 @@ function App() {
     <ToastProvider>
       <BrowserRouter>
       <Navigation />
-      <div className="flex  bg-gray-900 text-gray-100 h-screen overflow-hidden">
-      {user && user.role === "admin" && <Sidebar />}
+      <div className="flex  bg-gray-900 text-gray-100 h-screen overflow-x-hidden">
+      {user && user.role === "admin" && <Sidebar/>}
       <Routes>
           {/* routes for all */}
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-
+          {/* <Route path="/events/:id" element={<EventDetailsPage/>}/> */}
           {/* admin routes */}
           <Route
             path="/admin/overview"
@@ -44,11 +45,27 @@ function App() {
               </PrivateRoute>
             }
           />
+             <Route
+            path="/events/:id"
+            element={
+              <PrivateRoute role="admin">
+                <EventDetailsPage />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/admin/users/:id"
             element={
               <PrivateRoute role="admin">
                 <UserForm />
+              </PrivateRoute>
+            }
+          />
+           <Route
+            path="/admin/events"
+            element={
+              <PrivateRoute role="admin">
+                <EventsPage />
               </PrivateRoute>
             }
           />
@@ -58,7 +75,7 @@ function App() {
             path="/host/events"
             element={
               <PrivateRoute role="host">
-                <ProductsPage />
+                <EventsPage />
               </PrivateRoute>
             }
           />
@@ -68,7 +85,7 @@ function App() {
             path="/attendee/events"
             element={
               <PrivateRoute role="attendee">
-                <ProductsPage />
+                <EventsPage />
               </PrivateRoute>
             }
           />

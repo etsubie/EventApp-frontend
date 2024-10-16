@@ -19,7 +19,7 @@ export const fetchUsers = async () => {
     console.error("Error in fetchUsers:", error);
     return []; // Return an empty array in case of an error
   }
-};
+}
 
 //Fetch user by id
 
