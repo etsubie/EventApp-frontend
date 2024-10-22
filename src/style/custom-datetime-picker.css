@@ -1,0 +1,36 @@
+/* custom-datetime-picker.css */
+.react-datetime-picker {
+    background-color: white; 
+    color: black; 
+    height: 2.5rem; 
+    border-radius: 5px;
+  }
+  
+  .react-datetime-picker__wrapper {
+    padding: 5px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .react-datetime-picker__calendar {
+    background-color: white; 
+  }
+  
+  .react-datetime-picker__inputGroup {
+    background-color: white;
+  }
+  
+  .react-datetime-picker__inputGroup input {
+    height: 1rem; 
+    padding: 0.5rem; 
+    border: 1px solid #d1d5db; 
+    border-radius: 0.375rem; 
+  }
+  
+  .react-datetime-picker__inputGroup input:focus {
+    outline: none; 
+    border-color: #3b82f6; 
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5); 
+  }
+  

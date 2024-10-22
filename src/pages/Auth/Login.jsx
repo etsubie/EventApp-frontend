@@ -3,7 +3,7 @@
 import { Button, TextInput } from "flowbite-react";
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../../api/login";
+import { loginUser } from "../../api/auth";
 import { AuthContext } from "../../Context/AuthContext";
 
 export function Login() {
@@ -26,9 +26,9 @@ export function Login() {
       if (data.role === "admin") {
         navigate("/admin/overview");
       } else if (data.role === "host") {
-        navigate("/");
+        navigate("/host/events");
       } else if (data.role === "attendee") {
-        navigate("/attendee/");
+        navigate("/attendee/events");
       }
   
     } catch (error) {
@@ -36,7 +36,7 @@ export function Login() {
     }
   };
   return (
-    <div className="flex justify-center items-center w-full">
+    <div className="flex justify-center w-full mt-6">
       <form
         autoComplete="off"
         className="w-1/2 flex max-w-md flex-col gap-4 text-black"

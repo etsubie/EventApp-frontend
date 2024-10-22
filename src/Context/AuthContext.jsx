@@ -2,56 +2,55 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
-export const AppProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [user, setUser] = useState({}); 
-  const [loading, setLoading] = useState(true); 
+export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  async function getUser() {
+  const fetchUser = async () => {
     if (!token) {
-        setLoading(false); 
-        return;
+      setLoading(false);
+      return;
     }
 
     try {
-        const res = await fetch("/api/user", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+      const res = await fetch('/api/user', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setUser({
+          ...data,
+          role: data.roles.length > 0 ? data.roles[0] : null,
         });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            setUser({
-                ...data,
-                role: data.roles.length > 0 ? data.roles[0] : null, 
-            });
-        } else {
-            console.error("Failed to fetch user data:", data);
-        }
+      } else {
+        setUser(null);
+        localStorage.removeItem('token'); 
+      }
     } catch (error) {
-        console.error("Error fetching user:", error);
+      console.error('Error fetching user:', error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-}
-
-
+  };
+ 
   useEffect(() => {
-    getUser(); 
+    fetchUser();
   }, [token]);
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem("token", token); 
+      localStorage.setItem('token', token);
     } else {
-      localStorage.removeItem("token");
+      localStorage.removeItem('token');
     }
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, setToken, user, loading }}>
+    <AuthContext.Provider value={{ token, setToken, user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -13,85 +13,123 @@ import { AuthContext } from "./Context/AuthContext";
 import { ToastProvider } from "./Context/TostContext";
 import EventsPage from "./pages/EventsPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
+import { EventForm } from "./pages/EventForm";
+import {  CategoryDropdown } from "./components/events/CategoreyDropdown";
+import StripePaymentForm from "./components/Payment";
+import Events from "./pages/Events";
+import Eventspage from "./pages/attendee/Eventspage";
+import PageNotFound from "./pages/PageNotFound";
 
 function App() {
   const { user } = useContext(AuthContext);
   return (
     <ToastProvider>
       <BrowserRouter>
-      <Navigation />
-      <div className="flex  bg-gray-900 text-gray-100 h-screen overflow-x-hidden">
-      {user && user.role === "admin" && <Sidebar/>}
-      <Routes>
-          {/* routes for all */}
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          {/* <Route path="/events/:id" element={<EventDetailsPage/>}/> */}
-          {/* admin routes */}
-          <Route
-            path="/admin/overview"
-            element={
-              <PrivateRoute role="admin">
-                <OverviewPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="admin/users"
-            element={
-              <PrivateRoute role="admin">
-                <UsersPage />
-              </PrivateRoute>
-            }
-          />
-             <Route
-            path="/events/:id"
-            element={
-              <PrivateRoute role="admin">
-                <EventDetailsPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/admin/users/:id"
-            element={
-              <PrivateRoute role="admin">
-                <UserForm />
-              </PrivateRoute>
-            }
-          />
-           <Route
-            path="/admin/events"
-            element={
-              <PrivateRoute role="admin">
-                <EventsPage />
-              </PrivateRoute>
-            }
-          />
+        <Navigation />
+        <div className="flex bg-gray-900 text-gray-100 h-screen">
+        {user && (user.role === "admin" || user.role === "host") && <Sidebar />}
+        <Routes>
+            {/* routes for all */}
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/events/:id" element={<EventDetailsPage />} />
+            <Route path="/events/edit/:id" element={<EventForm />} />
+            <Route path="/public" element={<Events/>}/>
 
-          {/* host routes */}
-          <Route
-            path="/host/events"
-            element={
-              <PrivateRoute role="host">
-                <EventsPage />
-              </PrivateRoute>
-            }
-          />
+            {/* admin routes */}
+            <Route
+              path="/admin/overview"
+              element={
+                <PrivateRoute role="admin">
+                  <OverviewPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="admin/users"
+              element={
+                <PrivateRoute role="admin">
+                  <UsersPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin/users/:id"
+              element={
+                <PrivateRoute role="admin">
+                  <UserForm />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin/events"
+              element={
+                <PrivateRoute role="admin">
+                  <EventsPage />
+                </PrivateRoute>
+              }
+            />
 
-          {/* attendee routes */}
-          <Route
-            path="/attendee/events"
-            element={
-              <PrivateRoute role="attendee">
-                <EventsPage />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </div>
-    </BrowserRouter>
+            {/* host routes */}
+            <Route
+              path="/host/events"
+              element={
+                <PrivateRoute role="host">
+                  <EventsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/events/create"
+              element={
+                <PrivateRoute role="host">
+                  <EventForm />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/categories/create"
+              element={
+                <PrivateRoute role="host">
+                  <CategoryDropdown />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/categories"
+              element={
+                <PrivateRoute role="host">
+                  <CategoryDropdown />
+                </PrivateRoute>
+              }
+            />
+            {/* attendee routes */}
+            <Route
+              path="/attendee/events"
+              element={
+                <PrivateRoute role="attendee">
+                  <Eventspage />
+                </PrivateRoute>
+              }
+            />
+              <Route
+              path="/payment/:id"
+              element={
+                <PrivateRoute role="attendee" >
+                  <StripePaymentForm />
+                </PrivateRoute>
+              }
+            />
+              <Route
+              path="*"
+              element={
+                  <PageNotFound/>
+              }
+            />
+          </Routes>
+        </div>
+      </BrowserRouter>
     </ToastProvider>
   );
 }

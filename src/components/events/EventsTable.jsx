@@ -3,7 +3,7 @@ import { Edit, Search, Trash2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useToast } from "../../Context/TostContext";
 import { fetchEventsapi } from "../../api/events";
-import { useNavigate } from "react-router-dom"; // Use for navigation
+import { Link, useNavigate } from "react-router-dom"; 
 
 const EventsTable = () => {
   const [originalEvents, setOriginalEvents] = useState([]);
@@ -92,7 +92,7 @@ const EventsTable = () => {
                 Capacity
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Date
+                Location
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 Actions
@@ -104,42 +104,56 @@ const EventsTable = () => {
             {events.length > 0 ? (
               events.map((event) => (
                 <motion.tr
-                  key={event.id}
-                  onClick={() => handleRowClick(event.id)}
-                  className="hover:bg-gray-900 cursor-pointer"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                    {event.title}
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {event.category ? event.category.name : "No category"}
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    ${event.ticket_price}
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {event.capacity}
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {new Date(event.event_date).toLocaleDateString()}
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    <button className="text-indigo-400 hover:text-indigo-300 mr-2">
-                      <Edit size={18} />
-                    </button>
-                    <button className="text-red-400 hover:text-red-300">
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
-                </motion.tr>
+                key={event.id}
+                onClick={() => handleRowClick(event.id)}
+                className="hover:bg-gray-900 cursor-pointer"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                  {event.title}
+                </td>
+              
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {event.category ? event.category.name : "No category"}
+                </td>
+              
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  ${event.ticket_price}
+                </td>
+              
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {event.capacity}
+                </td>
+              
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {event.location}
+                </td>
+              
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 flex">
+                  {/* Edit Link */}
+                  <Link
+                    to={`/events/edit/${event.id}`}
+                    className="text-indigo-400 hover:text-indigo-300 mr-2"
+                    onClick={(e) => e.stopPropagation()} // Prevent row click
+                  >
+                    <Edit size={18} />
+                  </Link>
+              
+                  {/* Delete Button */}
+                  <button
+                    className="text-red-400 hover:text-red-300"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent row click
+                      handleDelete(event.id); 
+                    }}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </td>
+              </motion.tr>
+              
               ))
             ) : (
               <tr>

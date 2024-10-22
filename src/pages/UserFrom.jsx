@@ -30,7 +30,6 @@ export function UserForm() {
         });
       } catch (error) {
         console.error("Failed to fetch user data:", error);
-        addToast("Failed to load user data.", "error"); 
       }
     };
 
