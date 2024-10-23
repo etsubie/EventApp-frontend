@@ -19,6 +19,8 @@ import StripePaymentForm from "./components/Payment";
 import Events from "./pages/Events";
 import Eventspage from "./pages/attendee/Eventspage";
 import PageNotFound from "./pages/PageNotFound";
+import BookHost from "./pages/host/BookHost";
+import Mybooked from "./pages/attendee/Mybooked";
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -88,6 +90,14 @@ function App() {
                 </PrivateRoute>
               }
             />
+             <Route
+              path="/booked"
+              element={
+                <PrivateRoute role="host">
+                  <BookHost />
+                </PrivateRoute>
+              }
+            />
             <Route
               path="/categories/create"
               element={
@@ -110,6 +120,14 @@ function App() {
               element={
                 <PrivateRoute role="attendee">
                   <Eventspage />
+                </PrivateRoute>
+              }
+            />
+             <Route
+              path="/my-tickets"
+              element={
+                <PrivateRoute role="attendee">
+                  <Mybooked />
                 </PrivateRoute>
               }
             />
