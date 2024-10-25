@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { fetchUsers } from "../../api/users"; 
-import { Link } from "react-router-dom";
-import { useToast } from "../../Context/TostContext"; 
-import { deleteUserapi } from "../../api/users";
+import { fetchUsers, deleteUserapi } from "../../api/users";
+import { Link, useNavigate } from "react-router-dom";
+import { useToast } from "../../Context/TostContext";
+import { Modal, Button } from "flowbite-react";
+import { Trash2 } from "lucide-react";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const addToast = useToast(); 
+  const [showModal, setShowModal] = useState(false); // Modal state
+  const [selectedUser, setSelectedUser] = useState(null); // Store the user to delete
+  const addToast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getUsers = async () => {
       setLoading(true);
-      setError(null);
       try {
-        const data = await fetchUsers(); 
+        const data = await fetchUsers();
         if (Array.isArray(data)) {
           setUsers(data);
           setOriginalUsers(data);
@@ -46,55 +48,64 @@ const UsersTable = () => {
     setUsers(filtered);
   };
 
-  const handleDelete = async (userId) => {
+  const handleDelete = async () => {
     try {
-      await deleteUserapi(userId); 
-      setUsers((prev) => prev.filter((user) => user.id !== userId));
+      await deleteUserapi(selectedUser.id);
+      setUsers((prev) => prev.filter((user) => user.id !== selectedUser.id));
+      setShowModal(false);
       addToast("User deleted successfully!", "success");
     } catch (error) {
       addToast("Failed to delete user. Please try again.", "error");
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>; 
-  }
+  const openDeleteModal = (user) => {
+    setSelectedUser(user); // Set the user to delete
+    setShowModal(true); // Open modal
+  };
 
-  if (error) {
-    return <div>{error}</div>; 
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+      className="bg-white backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-400 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">Users</h2>
         <div className="relative">
           <input
             type="text"
             placeholder="Search users..."
-            className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="placeholder-gray-600 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={handleSearch}
           />
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
+        <table className="min-w-full divide-y  divide-gray-300">
           <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+                Role
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-700">
-            {Array.isArray(users) && users.length > 0 ? (
+          <tbody className="divide-y divide-gray-300">
+            {users.length > 0 ? (
               users.map((user) => (
                 <motion.tr
                   key={user.id}
@@ -110,27 +121,39 @@ const UsersTable = () => {
                         </div>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-100">{user.name}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.name}
+                        </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-300">{user.email}</div>
+                    <div className="text-sm text-gray-900">{user.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-800 text-blue-100">
                       {user.role ? user.role : "No Role"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    <Link to={`/admin/users/${user.id}`} className="text-indigo-400 hover:text-indigo-300 mr-2">Edit</Link>
-                    <button onClick={() => handleDelete(user.id)} className="text-red-400 hover:text-red-300">Delete</button>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <Link
+                      to={`/admin/users/${user.id}`}
+                      className="text-indigo-400 hover:text-indigo-300 mr-2"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => openDeleteModal(user)}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </motion.tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center text-gray-300">
+                <td colSpan="4" className="text-center">
                   No users found.
                 </td>
               </tr>
@@ -138,6 +161,41 @@ const UsersTable = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Flowbite Confirmation Modal */}
+      {selectedUser && (
+        <Modal
+          show={showModal}
+          size="md"
+          popup={true}
+          onClose={() => setShowModal(false)}
+        >
+          <Modal.Header />
+          <Modal.Body>
+            <div className="text-center">
+              <Trash2 className="mx-auto mb-4 h-14 w-14 text-red-500" />
+              <h3 className="mb-5 text-lg font-normal text-gray-500">
+                <h3 className="mb-5 text-lg font-normal text-gray-500">
+                  Are you sure you want to delete{" "}
+                  <span className="text-blue-700">{selectedUser.name}</span>?
+                  This action cannot be undone.
+                </h3>
+              </h3>
+              <div className="flex justify-center gap-4">
+                <Button className="text-blue-800" onClick={handleDelete}>
+                  Yes, I'm sure
+                </Button>
+                <Button
+                  className="text-red-800"
+                  onClick={() => setShowModal(false)}
+                >
+                  No, cancel
+                </Button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
+      )}
     </motion.div>
   );
 };

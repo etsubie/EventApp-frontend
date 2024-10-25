@@ -75,16 +75,16 @@ const handleSubmit = async (event) => {
   };
   
   return (
-    <div className="flex flex-col space-y-4 p-10 bg-white w-full h-full justify-center items-center">
+    <div className="flex flex-col space-y-4  w-full h-full justify-center items-center">
       <form
         onSubmit={handleSubmit}
-        className=" rounded h-72 p-5 w-96 space-y-4 text-black shadow-xl"
+        className=" rounded h-72 p-5 w-96 space-y-4 bg-white shadow-xl"
       >
         <h2 className="font-bold text-xl text-center">Complete Payment for</h2>
         <h1 className="font-bold "> {event.title}</h1>
         <p>Price: ${event.ticket_price}</p>
         <CardElement />
-        <Button type="submit" disabled={!stripe} className="w-full bg-green-500 ">
+        <Button type="submit" disabled={!stripe} className="w-full bg-blue-900 ">
           Pay
         </Button>
       </form>

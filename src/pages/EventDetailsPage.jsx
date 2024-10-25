@@ -8,6 +8,7 @@ import { fetchEventapi } from "../api/events";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../Context/TostContext";
 import { Approveapi, rejectapi } from "../api/approve";
+import { imageUrl } from "../api/image";
 
 const EventDetailsPage = () => {
   const [event, setEvent] = useState({});
@@ -18,6 +19,7 @@ const EventDetailsPage = () => {
   const { id } = useParams();
   const [hasApproved, setHasApproved] = useState(false);
   const [hasRejected, setHasRejected] = useState(false);
+
 
   useEffect(() => {
     const getEvent = async () => {
@@ -58,7 +60,7 @@ const EventDetailsPage = () => {
       addToast("Approved successfully!", "success");
     } catch (error) {
       console.error("Update error:", error);
-      addToast("Update failed: An unexpected error occurred.", "error");
+      addToast(error.message, "error");
     }
   };
 
@@ -82,13 +84,17 @@ const EventDetailsPage = () => {
   };
 
   return (
-    <div className="p-8 flex flex-col h-full space-y-4 w-full bg-white text-black">
+    <div className="p-8 flex flex-col h-full space-y-5 w-full bg-white">
       <div className="w-full p-0 sm:h-72">
-        <img src={R} alt="img" className="w-full h-full" />
+        <img
+          src={event.image ? `${imageUrl}/${event.image}` : R}
+          alt="Fallback Image"
+          className="w-full h-full object-cover"
+        />
       </div>
       <h1 className="font-bold text-xl">{event.title || "Event Title"}</h1>
       <div className="flex space-x-20">
-        <span className="bg-gray-100 text-green-500 p-1 px-3 rounded">
+        <span className="bg-gray-100 text-blue-900 font-bold p-1 px-3 rounded">
           ${event.ticket_price || "Price not available"}
         </span>
         <span className="bg-gray-100 p-1 px-3 rounded ">
@@ -126,14 +132,14 @@ const EventDetailsPage = () => {
             onClick={() => handleApprove(event.id)}
             disabled={hasApproved}
           >
-           { loading? 'Approving' : 'Approve'}
+            {loading ? "Approving" : "Approve"}
           </Button>
           <Button
             className="bg-red-900 border-none"
             onClick={() => handleReject(event.id)}
             disabled={hasRejected}
           >
-            {loading ? 'Rejecting' :'Reject'}
+            {loading ? "Rejecting" : "Reject"}
           </Button>
         </div>
       ) : user?.role === "host" ? (
@@ -169,12 +175,14 @@ const EventDetailsPage = () => {
         <h1 className="font-semibold">Description</h1>
         <p>{event.description || "No description available"}</p>
       </div>
-      <div className="flex justify-end"><Button
-        className="bg-blue-950 border-none w-28 mb-10 flex"
-        onClick={() => window.scrollTo(0, 0)}
-      >
-        <ArrowUp/>
-      </Button></div>
+      <div className="flex justify-end">
+        <Button
+          className="bg-blue-950 border-none w-28 mb-10 flex"
+          onClick={() => window.scrollTo(0, 0)}
+        >
+          <ArrowUp />
+        </Button>
+      </div>
     </div>
   );
 };

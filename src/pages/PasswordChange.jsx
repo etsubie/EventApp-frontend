@@ -1,17 +1,16 @@
-import { Button, TextInput, Dropdown } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { Button, TextInput } from "flowbite-react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getUserByIdApi, updateUserapi } from "../api/users";
 import { useToast } from "../Context/TostContext"; 
+import { AuthContext } from "../Context/AuthContext";
 
-export function UserForm() {
+export function ChangPass() {
   const addToast = useToast(); 
+  const {user} = useContext(AuthContext)
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
     password: "",
     password_confirmation: "",
-    role: "",
   });
 
   const { id } = useParams();
@@ -22,9 +21,6 @@ export function UserForm() {
       try {
         const data = await getUserByIdApi(id);
         setFormData({
-          name: data.name,
-          email: data.email,
-          role: data.role,
           password: "",
           password_confirmation: "",
         });
@@ -47,7 +43,7 @@ export function UserForm() {
     try {
       await updateUserapi(id, formData);
       addToast("Updated successfully!", "success"); 
-      navigate("/admin/users");
+      navigate(`/profile/${user.id}`);
     } catch (error) {
       console.error("Update error:", error);
       addToast("Update failed: " + error.message, "error"); 
@@ -62,30 +58,8 @@ export function UserForm() {
         className="w-1/2 flex max-w-md flex-col gap-4 shadow-lg p-4"
       >
         <h1 className="text-xl font-bold text-center ">
-          Update User Data
+         Change Password
         </h1>
-        <div>
-          <TextInput
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="Name"
-            required
-            shadow
-          />
-        </div>
-        <div>
-          <TextInput
-            type="email"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            placeholder="Email"
-            required
-            shadow
-          />
-        </div>
         <div>
           <TextInput
             type="password"
@@ -112,25 +86,11 @@ export function UserForm() {
           />
         </div>
         <div className="bg-blue-900 rounded">
-  <Dropdown
-    label={formData.role ? `Role: ${formData.role}` : "Select Role"}  
-  >
-    <Dropdown.Item
-      onClick={() => setFormData({ ...formData, role: "host" })}
-    >
-      Host
-    </Dropdown.Item>
-    <Dropdown.Item
-      onClick={() => setFormData({ ...formData, role: "attendee" })}
-    >
-      Attendee
-    </Dropdown.Item>
-  </Dropdown>
 </div>
 
-        <Button type="submit" className="bg-blue-900">Update</Button>
+        <Button type="submit" className="bg-blue-900">Change</Button>
         <Link to="/admin/users">
-          Go back to User List
+          Go back to Profile
         </Link>
       </form>
     </div>

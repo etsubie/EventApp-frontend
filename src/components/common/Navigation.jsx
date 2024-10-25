@@ -1,14 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Navbar, Button } from "flowbite-react";
+import { Navbar, Button, Modal } from "flowbite-react";
 import logo from "../../images/d.jpg";
 import { useContext, useEffect, useState } from "react";
-import Notifications from "../events/Notifications";
 import { AuthContext } from "../../Context/AuthContext";
 import { logoutUser } from "../../api/auth";
 import { Search } from "lucide-react";
 
 export function Navigation() {
   const [events, setEvents] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { token, user, setToken, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export function Navigation() {
         });
       } else {
         console.error("Failed to fetch user data:", data);
-        setUser(null); 
+        setUser(null);
       }
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -44,7 +44,7 @@ export function Navigation() {
   };
 
   useEffect(() => {
-    fetchUser(); 
+    fetchUser();
   }, [token]);
 
   const handleLogout = async () => {
@@ -54,7 +54,7 @@ export function Navigation() {
         localStorage.removeItem("token"); // Clear the token
         setToken(null); // Clear the token in context
         setUser(null); // Clear user data on logout
-        navigate('/'); 
+        navigate('/');
       } else {
         console.error('Logout error:', data);
       }
@@ -64,19 +64,11 @@ export function Navigation() {
   };
 
   const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    const filtered = originalEvents.filter(
-      (event) =>
-        event.title.toLowerCase().includes(term) ||
-        event.location.toLowerCase().includes(term) ||
-        (event.category && event.category.name.toLowerCase().includes(term))
-    );
-    setEvents(filtered);
+    setSearchTerm(e.target.value);
   };
 
   return (
-    <Navbar fluid className="px-6 text-gray-100 bg-gray-800">
+    <Navbar fluid className="px-6 text-gray-100 bg-gray-800 bg-opacity-50">
       <Navbar.Brand as={Link} to="/">
         <img src={logo} className="mr-3 h-6 sm:h-9" alt="Logo" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
@@ -96,7 +88,6 @@ export function Navigation() {
             <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
           </div>
         )}
-        {/* <Notifications isDropdownOpen={isDropdownOpen} setDropdownOpen={setDropdownOpen} /> */}
         {user ? (
           <>
             {user.role === 'host' && (
@@ -109,7 +100,10 @@ export function Navigation() {
               Logout
             </Button>
             <div className="flex flex-wrap gap-2">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-semibold">
+              <div 
+                className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-semibold cursor-pointer"
+                onClick={() => setShowModal(true)} 
+              >
                 {user.name?.charAt(0) || 'U'}
               </div>
             </div>
@@ -120,6 +114,20 @@ export function Navigation() {
           </Link>
         )}
       </div>
+      <Modal show={showModal} size="md" popup={true} onClose={() => setShowModal(false)} className="flex justify-end">
+        <Modal.Header />
+        <Modal.Body>
+          {user ? (
+            <div className="text-center">
+              <Link to={`/profile/${user.id}`} className="text-blue-800" onClick={() => setShowModal(false)}>
+                View Profile
+              </Link>
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">No user data available</div>
+          )}
+        </Modal.Body>
+      </Modal>
     </Navbar>
   );
 }

@@ -1,15 +1,11 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Sidebar from "./components/common/Sidebar";
 import OverviewPage from "./pages/admin/OverviewPage";
 import UsersPage from "./pages/admin/UsersPage";
 import Home from "./pages/Home";
 import { Register } from "./pages/Auth/Register";
 import { Login } from "./pages/Auth/Login";
 import PrivateRoute from "./Context/PrivateRoute/PrivateRoute";
-import { Navigation } from "./components/common/Navigation";
 import { UserForm } from "./pages/UserFrom";
-import { useContext } from "react";
-import { AuthContext } from "./Context/AuthContext";
 import { ToastProvider } from "./Context/TostContext";
 import EventsPage from "./pages/EventsPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
@@ -21,15 +17,16 @@ import Eventspage from "./pages/attendee/Eventspage";
 import PageNotFound from "./pages/PageNotFound";
 import BookHost from "./pages/host/BookHost";
 import Mybooked from "./pages/attendee/Mybooked";
+import Layout from "./components/common/Layout";
+import SettingsPage from "./pages/admin/SettingsPage";
+import { Profiledata } from "./pages/Profiledata";
+import { ChangPass } from "./pages/PasswordChange";
 
 function App() {
-  const { user } = useContext(AuthContext);
   return (
     <ToastProvider>
       <BrowserRouter>
-        <Navigation />
-        <div className="flex bg-gray-900 text-gray-100 h-screen">
-        {user && (user.role === "admin" || user.role === "host") && <Sidebar />}
+        <Layout>
         <Routes>
             {/* routes for all */}
             <Route path="/" element={<Home />} />
@@ -38,6 +35,11 @@ function App() {
             <Route path="/events/:id" element={<EventDetailsPage />} />
             <Route path="/events/edit/:id" element={<EventForm />} />
             <Route path="/public" element={<Events/>}/>
+            <Route path="/profile/:id" element={<SettingsPage />} />
+            <Route path="/profile/edit/:id" element={<Profiledata />} />
+            <Route path="/change-password/:id" element={<ChangPass />} />
+
+
 
             {/* admin routes */}
             <Route
@@ -146,7 +148,7 @@ function App() {
               }
             />
           </Routes>
-        </div>
+        </Layout>
       </BrowserRouter>
     </ToastProvider>
   );

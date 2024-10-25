@@ -65,9 +65,9 @@ export function Register() {
       <form
         onSubmit={handleRegister}
         autoComplete="none"
-        className="w-1/2 flex max-w-md flex-col gap-4 text-black"
+        className="w-1/2 flex max-w-md flex-col gap-4 p-4 shadow-lg"
       >
-        <h1 className="text-xl font-bold text-center text-gray-100">
+        <h1 className="text-xl font-bold text-center">
           Create a New Account
         </h1>
 
@@ -113,22 +113,25 @@ export function Register() {
         />
 
         {/* Role Dropdown */}
-        <Dropdown
-          label={formData.role ? `Role: ${formData.role}` : "Register as"}
-          onChange={(role) => setFormData({ ...formData, role })}
-          dismissOnClick={false}
-        >
-          <Dropdown.Item onClick={() => setFormData({ ...formData, role: "host" })}>
-            Host
-          </Dropdown.Item>
-          <Dropdown.Item onClick={() => setFormData({ ...formData, role: "attendee" })}>
-            Attendee
-          </Dropdown.Item>
-        </Dropdown>
+        <div className="bg-blue-900 rounded">
+          <Dropdown
+            label={formData.role ? `Role: ${formData.role}` : "Select Role"}
+          >
+            <Dropdown.Item
+              onClick={() => setFormData({ ...formData, role: "host" })}
+            >
+              Host
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => setFormData({ ...formData, role: "attendee" })}
+            >
+              Attendee
+            </Dropdown.Item>
+          </Dropdown>
+        </div>
+        <Button type="submit" className="bg-blue-900">Sign Up</Button>
 
-        <Button type="submit">Sign Up</Button>
-
-        <Link to="/login" className="text-gray-100">
+        <Link to="/login" >
           Already have an account? Login
         </Link>
       </form>

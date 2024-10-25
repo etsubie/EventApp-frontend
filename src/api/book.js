@@ -1,6 +1,8 @@
-const API_URL = 'api/booked';
-const API_URm = 'api/mybooked';
-
+const API_URL = '/api/booked';
+const API_URm = '/api/mybooked';
+ 
+  
+  
 export const fetchBooked = async () => {
     try {
       const response = await fetch(API_URL, {

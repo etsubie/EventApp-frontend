@@ -38,11 +38,10 @@ export function Login() {
   return (
     <div className="flex justify-center w-full mt-6">
       <form
-        autoComplete="off"
-        className="w-1/2 flex max-w-md flex-col gap-4 text-black"
+        className="w-1/2 flex max-w-md flex-col gap-4 shadow-lg p-4"
         onSubmit={handleLogin}
       >
-        <h1 className="text-xl font-bold text-center text-gray-100">
+        <h1 className="text-xl font-bold text-center">
           Login into Your Account
         </h1>
         {errorMessage && <p className="text-red-500">{errorMessage}</p>}
@@ -68,9 +67,9 @@ export function Login() {
             required
           />
         </div>
-        <Button type="submit">Login</Button>
+        <Button type="submit" className="bg-blue-900">Login</Button>
 
-        <Link to="/register" className="text-gray-100">
+        <Link to="/register">
           Don’t have an account? Sign Up
         </Link>
       </form>

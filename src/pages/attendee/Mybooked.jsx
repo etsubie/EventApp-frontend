@@ -34,9 +34,9 @@ const Mybooked = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="bg-white h-full">
-      <h1 className="text-xl font-bold text-black text-center mt-6">Events</h1>
-      <div className="flex space-x-4 flex-wrap space-y-5 justify-center mb-6">
+    <div className="h-full">
+      <h1 className="text-xl font-bold text-center mt-6">Events</h1>
+      <div className="flex space-x-4 flex-wrap space-y-5 justify-center">
         {events.length > 0 ? (
           events.map((booking) => (
             <Link key={booking.event_id} to={`/events/${booking.event_id}`}>

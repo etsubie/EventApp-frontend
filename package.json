@@ -21,6 +21,7 @@
     "react-datetime-picker": "^6.0.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.9",
+    "react-file-base64": "^1.0.3",
     "react-router-dom": "^6.25.1",
     "react-time-picker": "^7.0.0",
     "recharts": "^2.12.7"

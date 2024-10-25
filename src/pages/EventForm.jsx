@@ -7,7 +7,9 @@ import { fetchEventapi, updateEventsapi, createEventapi } from "../api/events";
 import { CategoryDropdown } from "../components/events/CategoreyDropdown";
 import "react-datetime-picker/dist/DateTimePicker.css";
 import "../style/custom-datetime-picker.css";
+import FileBase from 'react-file-base64';
 import { AuthContext } from "../Context/AuthContext";
+import { imageUrl } from "../api/image";
 
 export function EventForm() {
   const addToast = useToast();
@@ -25,6 +27,8 @@ export function EventForm() {
     end_date: new Date(),
     capacity: "",
     category_id: null,
+    image: "",  // This holds the Base64 string
+    imagePreviewUrl: "", // This holds the image preview URL
   });
 
   useEffect(() => {
@@ -41,6 +45,7 @@ export function EventForm() {
             start_date: new Date(eventData.start_date),
             end_date: new Date(eventData.end_date),
             category_id: eventData.category_id,
+            imagePreviewUrl: eventData.image ? `${imageUrl}/${eventData.image}` : "",
           });
         } catch (error) {
           console.error("Error fetching event:", error);
@@ -56,10 +61,7 @@ export function EventForm() {
     e.preventDefault();
 
     if (formData.start_date > formData.end_date) {
-      addToast(
-        "Start date and time cannot be after end date and time",
-        "error"
-      );
+      addToast("Start date and time cannot be after end date and time", "error");
       return;
     }
 
@@ -90,11 +92,18 @@ export function EventForm() {
     }
   };
 
+  // Function to handle image preview and Base64 conversion
+  const handleImageUpload = (file) => {
+    setFormData({
+      ...formData,
+      image: file.base64,  // Base64 string for the image
+      imagePreviewUrl: file.base64  // Preview the image
+    });
+  };
+
   return (
     <div className="flex flex-wrap h-full justify-center items-center w-full bg-white p-6">
-      <form
-        className="w-full flex flex-col gap-4 text-black"
-      >
+      <form className="w-full flex flex-col gap-4 text-black" onSubmit={handleSubmit}>
         <h1 className="text-xl font-bold text-center">
           {id ? "Update Event" : "Create Event"}
         </h1>
@@ -113,6 +122,7 @@ export function EventForm() {
           onCategorySelect={(categoryId) =>
             setFormData({ ...formData, category_id: categoryId })
           }
+          initialCategoryId={formData.category_id} // Pass the selected category ID
         />
 
         <Textarea
@@ -154,6 +164,7 @@ export function EventForm() {
           placeholder="Capacity"
           shadow
         />
+
         <label>Start Date and Time</label>
         <DateTimePicker
           onChange={(value) => setFormData({ ...formData, start_date: value })}
@@ -162,17 +173,37 @@ export function EventForm() {
           disableClock={false}
           className="w-full bg-white"
         />
+
         <label>End Date and Time</label>
         <DateTimePicker
           onChange={(value) => setFormData({ ...formData, end_date: value })}
           value={formData.end_date}
           format="y-MM-dd h:mm a"
           disableClock={false}
-          className="w-full bg-white "
+          className="w-full bg-white"
         />
+
+        {/* Image Preview */}
+        {formData.imagePreviewUrl && (
+          <div className="mt-4">
+            <label>Image Preview:</label>
+            <img
+              src={formData.imagePreviewUrl}
+              alt="Selected"
+              className="w-32 h-32 object-cover mt-2"
+            />
+          </div>
+        )}
+
+        {/* FileBase for Image Upload */}
+        <FileBase
+          type="file"
+          multiple={false}
+          onDone={handleImageUpload}
+        />
+
         <div className="flex space-x-4 mb-10">
-          {" "}
-          <Button className="bg-blue-950 w-full" onClick={handleSubmit}>
+          <Button className="bg-blue-950 w-full" type="submit">
             {loading
               ? id
                 ? "Updating..."

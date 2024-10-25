@@ -6,8 +6,8 @@ export function CategoryDropdown({ onCategorySelect, initialCategoryId }) {
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(initialCategoryId || ""); 
-  
+  const [selectedCategory, setSelectedCategory] = useState(initialCategoryId || "");
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -29,8 +29,9 @@ export function CategoryDropdown({ onCategorySelect, initialCategoryId }) {
       if (createdCategory && createdCategory.id && createdCategory.name) {
         const newCategoryObj = { id: createdCategory.id, name: createdCategory.name };
         setCategories((prevCategories) => [...prevCategories, newCategoryObj]);
-        setSelectedCategory(newCategoryObj.id); 
-        onCategorySelect(newCategoryObj.id); 
+        setSelectedCategory(newCategoryObj.id);
+        onCategorySelect(newCategoryObj.id);
+        setNewCategory(""); // Clear the input after creation
       }
       setModalOpen(false);
     } catch (error) {
@@ -53,9 +54,9 @@ export function CategoryDropdown({ onCategorySelect, initialCategoryId }) {
           const selectedValue = e.target.value;
           setSelectedCategory(selectedValue);
           if (selectedValue === "create-new") {
-            setModalOpen(true); 
+            setModalOpen(true);
           } else {
-            onCategorySelect(selectedValue); 
+            onCategorySelect(selectedValue);
           }
         }}
         value={selectedCategory || ""}

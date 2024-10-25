@@ -31,12 +31,12 @@ const BookHost = () => {
   }
 
   return (
-    <div className="p-8 flex flex-col space-y-4">
+    <div className="p-8 flex flex-col space-y-4 justify-center items-center">
       <h1 className="text-2xl font-bold">My Events Booking Progress</h1>
       {events.length > 0 ? (
         events.map(event => (
-          <div key={event.id} className="border p-4">
-            <h2 className="text-xl font-semibold">{event.title}</h2>
+          <div key={event.id} className="border w-64 p-4 bg-white rounded space-y-2">
+            <h2 className="text-xl font-semibold mb-2">{event.title}</h2>
             <p>Capacity: {event.capacity}</p>
             <p>Booked Tickets: {event.bookings_count}</p>
             <p>Remaining Tickets: {event.remaining_capacity}</p>
