@@ -86,7 +86,7 @@ const {addToast} = useToast
   const totalEvents = events.length;
   const totalUsers = users.length;
   const totalBookings = books.length;
-  const totalSales = books.reduce((total, book) => total + book.event.ticket_price, 0);
+  const totalSales = books.reduce((total, book) => total + Number(book.event.ticket_price), 0);
 
   return (
     <div className="flex-1 overflow-auto relative z-10">

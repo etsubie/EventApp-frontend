@@ -1,4 +1,4 @@
-import { User } from "lucide-react";
+import { Loader, User } from "lucide-react";
 import SettingSection from "./SettingSection";
 import { getUserByIdApi } from "../../api/users";
 import { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ const Profile = () => {
     getUsers();
   }, [id]); 
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p><Loader/></p>;
   if (error) return <p>{error}</p>;
 
   return (

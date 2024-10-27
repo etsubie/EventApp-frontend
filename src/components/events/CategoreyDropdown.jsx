@@ -49,7 +49,7 @@ export function CategoryDropdown({ onCategorySelect, initialCategoryId }) {
   return (
     <div>
       <select
-        className="w-full rounded"
+        className="w-full rounded border-gray-300"
         onChange={(e) => {
           const selectedValue = e.target.value;
           setSelectedCategory(selectedValue);
@@ -61,7 +61,7 @@ export function CategoryDropdown({ onCategorySelect, initialCategoryId }) {
         }}
         value={selectedCategory || ""}
       >
-        <option value="" disabled hidden>
+        <option value="" disabled hidden className="text-gray-100 text-sm">
           Select Category
         </option>
         {categories.map((category) => (

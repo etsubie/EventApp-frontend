@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
-import R from "../images/R.jpg";
+import R from "../../images/R.jpg";
 import { Link } from "react-router-dom";
-import { fetchEventsapi } from "../api/public";
-import { Card } from "flowbite-react";
-import { imageUrl } from "../api/image";
+import { fetchEventsapi } from "../../api/events";
+import { Card } from "flowbite-react"; 
 import { Loader, MapPinIcon } from "lucide-react";
+import { imageUrl } from "../../api/image";
 
-const Events = () => {
+const UpcomingEvents = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const capitalizeFirstLetter = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
@@ -20,7 +21,13 @@ const Events = () => {
       setError(null);
       try {
         const data = await fetchEventsapi();
-        setEvents(data);
+        if (Array.isArray(data)) {
+          // Filter upcoming or ongoing events
+          const upcomingEvents = data.filter(event => new Date(event.end_date) >= new Date());
+          setEvents(upcomingEvents);
+        } else {
+          throw new Error("Unexpected data format from server.");
+        }
       } catch (error) {
         setError(error.message);
         console.log(error.message);
@@ -35,12 +42,12 @@ const Events = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="w-full  h-full">
-      <h1 className="text-xl font-bold text-center mb-6">Events</h1>
+    <div>
+      <h1 className="text-xl font-bold text-center mb-6">Upcoming Events</h1>
       <div className="flex space-x-4 flex-wrap justify-center">
         {events.length > 0 ? (
-          events.map((event) => (
-            <Link key={event.id} to={`/events/${event.id}`}>
+          events.map((event, index) => (
+            <Link key={`${event.id}-${index}`} to={`/events/${event.id}`}>
               <Card
                 className="max-w-sm w-80 shadow-xl mb-5"
                 renderImage={() => (
@@ -64,8 +71,8 @@ const Events = () => {
 
                 <h1 className="font-bold text-xl tracking-tight text-gray-900 dark:text-white">
                   {capitalizeFirstLetter(
-                    event.title.split(" ").slice(0, 3).join(" ") +
-                      (event.title.split(" ").length > 3 ? "..." : "")
+                    event.title.split(" ").slice(0, 2).join(" ") +
+                      (event.title.split(" ").length > 2 ? "..." : "")
                   )}
                 </h1>
 
@@ -84,11 +91,11 @@ const Events = () => {
             </Link>
           ))
         ) : (
-          <span> No events found.</span>
+          <span className="text-center">No upcoming events found.</span>
         )}
       </div>
     </div>
   );
 };
 
-export default Events;
+export default UpcomingEvents;

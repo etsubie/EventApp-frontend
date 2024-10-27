@@ -12,6 +12,7 @@ const stripePromise = loadStripe(
 
 const PaymentForm = () => {
   const stripe = useStripe();
+  const [loading, setLoading] = useState(false);
   const elements = useElements();
   const [event, setEvent] = useState({});
   const [paymentSuccess, setPaymentSuccess] = useState(null);
@@ -49,11 +50,8 @@ const handleSubmit = async (event) => {
       if (error) {
         setError(error.message);
         return; 
-      }
-  
-      setPaymentSuccess("Payment successful! (Simulated in test mode)");
-  
-      // Proceed to confirm booking
+      }  
+      //confirm booking
       const response = await fetch('/api/confirm-booking', {
         method: 'POST',
         headers: {
@@ -64,7 +62,7 @@ const handleSubmit = async (event) => {
   
       if (response.ok) {
         const data = await response.json();
-        setPaymentSuccess(`Payment successful and booking confirmed!`);
+        setPaymentSuccess(`Payment successful and booking confirmed! you will receive email `);
       } else {
         const errorData = await response.json();
         setError(errorData.message || 'Booking failed.');
@@ -85,7 +83,7 @@ const handleSubmit = async (event) => {
         <p>Price: ${event.ticket_price}</p>
         <CardElement />
         <Button type="submit" disabled={!stripe} className="w-full bg-blue-900 ">
-          Pay
+          {loading ? "Processing..." : "Pay"} 
         </Button>
       </form>
       {error && <div style={{ color: "red" }}>{error}</div>}

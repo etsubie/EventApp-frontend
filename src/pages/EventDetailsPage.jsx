@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button } from "flowbite-react";
 import { AuthContext } from "../Context/AuthContext";
 import R from "../images/R.jpg";
-import { ArrowUp, CalendarIcon, MapPinIcon } from "lucide-react";
+import { ArrowBigLeft, ArrowUp, CalendarIcon, Loader, MapPinIcon } from "lucide-react";
 import { fetchEventapi } from "../api/events";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../Context/TostContext";
@@ -45,6 +45,7 @@ const EventDetailsPage = () => {
   if (error) {
     return <p className="text-red-500">Error: {error}</p>;
   }
+  if(loading){<div><Loader/></div>}
   const handleApprove = async (id) => {
     // Check if event is already approved
     if (hasApproved) {
@@ -87,18 +88,19 @@ const EventDetailsPage = () => {
     <div className="p-8 flex flex-col h-full space-y-5 w-full bg-white">
       <div className="w-full p-0 sm:h-72">
         <img
-          src={event.image ? `${imageUrl}/${event.image}` : R}
+          src={ `${imageUrl}/${event.image}`}
           alt="Fallback Image"
           className="w-full h-full object-cover"
         />
       </div>
+      <ArrowBigLeft onClick={()=> navigate(-1)} className="bg-gray-100 cursor-pointer"/>
       <h1 className="font-bold text-xl">{event.title || "Event Title"}</h1>
-      <div className="flex space-x-20">
-        <span className="bg-gray-100 text-blue-900 font-bold p-1 px-3 rounded">
-          ${event.ticket_price || "Price not available"}
+      <div className="flex flex-col">
+        <span className=" text-blue-900 font-bold ">
+         Price: ${event.ticket_price || "Price not available"}
         </span>
-        <span className="bg-gray-100 p-1 px-3 rounded ">
-          {event.category ? event.category.name : "No category"}
+        <span >
+          Category: {event.category ? event.category.name : "No category"}
         </span>
       </div>
       {user?.role !== "host" && (
@@ -128,7 +130,7 @@ const EventDetailsPage = () => {
       {user?.role === "admin" ? (
         <div className="flex space-x-4">
           <Button
-            className="bg-blue-950 border-none"
+            className="bg-blue-800 border-none"
             onClick={() => handleApprove(event.id)}
             disabled={hasApproved}
           >
@@ -147,7 +149,7 @@ const EventDetailsPage = () => {
       ) : user?.role === "attendee" ? (
         event.remaining_capacity > 0 &&
         new Date(event.end_date) > new Date() ? (
-          <Button className="bg-blue-950 border-none w-28" onClick={handleBook}>
+          <Button className="bg-blue-800 border-none w-28" onClick={handleBook}>
             Buy
           </Button>
         ) : (
@@ -177,7 +179,7 @@ const EventDetailsPage = () => {
       </div>
       <div className="flex justify-end">
         <Button
-          className="bg-blue-950 border-none w-28 mb-10 flex"
+          className="bg-gray-200 text-black border-none w-28 mb-10 flex"
           onClick={() => window.scrollTo(0, 0)}
         >
           <ArrowUp />

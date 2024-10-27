@@ -16,7 +16,8 @@ export function EventForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, loading } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false)
+  const { user } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -180,7 +181,7 @@ export function EventForm() {
           value={formData.end_date}
           format="y-MM-dd h:mm a"
           disableClock={false}
-          className="w-full bg-white"
+          className="w-full bg-white border"
         />
 
         {/* Image Preview */}

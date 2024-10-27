@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Edit, Search, Trash2 } from "lucide-react";
+import { Edit, Loader, Search, Trash2 } from "lucide-react";
 import { useToast } from "../../Context/TostContext";
 import { deletEventapi, fetchEventsapi } from "../../api/events";
 import { Link, useNavigate } from "react-router-dom";
-import { Modal, Button } from "flowbite-react"; // Import Flowbite Modal and Button
+import { Modal, Button } from "flowbite-react";
 
 const EventsTable = () => {
   const [originalEvents, setOriginalEvents] = useState([]);
@@ -12,8 +12,8 @@ const EventsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
-  const [selectedEvent, setSelectedEvent] = useState(null); // State to store selected event for deletion
+  const [showModal, setShowModal] = useState(false); 
+  const [selectedEvent, setSelectedEvent] = useState(null); 
 
   const addToast = useToast();
   const navigate = useNavigate();
@@ -71,7 +71,7 @@ const EventsTable = () => {
     setShowModal(true); // Open the modal
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><Loader/></div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -175,8 +175,6 @@ const EventsTable = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Flowbite Confirmation Modal */}
       <Modal show={showModal} size="md" popup={true} onClose={() => setShowModal(false)}>
         <Modal.Header />
         <Modal.Body>

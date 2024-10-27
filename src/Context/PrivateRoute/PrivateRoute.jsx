@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../../Context/AuthContext';
+import { Loader } from 'lucide-react';
 
 const PrivateRoute = ({ children, role }) => {
   const { user, loading } = useContext(AuthContext);
@@ -19,7 +20,7 @@ const PrivateRoute = ({ children, role }) => {
   }, [user, loading]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div><Loader/></div>;
   }
 
   if (redirectToLogin) {
@@ -27,7 +28,6 @@ const PrivateRoute = ({ children, role }) => {
   }
 
   if (user && user.role !== role) {
-    console.log(`User role "${user.role}" does not match required role "${role}"`);
     return <Navigate to="/" />;
   }
 

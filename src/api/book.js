@@ -32,9 +32,7 @@ export const fetchBooked = async () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-  
-      console.log('Response Status:', response.status);
-      const data = await response.json();
+        const data = await response.json();
       
       if (!response.ok) {
         console.error('Response Body:', data); 

@@ -10,7 +10,7 @@ import { ToastProvider } from "./Context/TostContext";
 import EventsPage from "./pages/EventsPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import { EventForm } from "./pages/EventForm";
-import {  CategoryDropdown } from "./components/events/CategoreyDropdown";
+import { CategoryDropdown } from "./components/events/CategoreyDropdown";
 import StripePaymentForm from "./components/Payment";
 import Events from "./pages/Events";
 import Eventspage from "./pages/attendee/Eventspage";
@@ -21,25 +21,33 @@ import Layout from "./components/common/Layout";
 import SettingsPage from "./pages/admin/SettingsPage";
 import { Profiledata } from "./pages/Profiledata";
 import { ChangPass } from "./pages/PasswordChange";
+import { useContext } from "react";
+import { AuthContext } from "./Context/AuthContext";
 
 function App() {
+  const { user } = useContext(AuthContext);
   return (
     <ToastProvider>
       <BrowserRouter>
         <Layout>
-        <Routes>
+          <Routes>
             {/* routes for all */}
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/events/:id" element={<EventDetailsPage />} />
             <Route path="/events/edit/:id" element={<EventForm />} />
-            <Route path="/public" element={<Events/>}/>
-            <Route path="/profile/:id" element={<SettingsPage />} />
-            <Route path="/profile/edit/:id" element={<Profiledata />} />
-            <Route path="/change-password/:id" element={<ChangPass />} />
+            <Route path="/public" element={<Events />} />
 
+            <Route path="*" element={<PageNotFound />} />
 
+            {user && (
+              <>
+                <Route path="/profile/:id" element={<SettingsPage />} />
+                <Route path="/profile/edit/:id" element={<Profiledata />} />
+                <Route path="/change-password/:id" element={<ChangPass />} />
+              </>
+            )}
 
             {/* admin routes */}
             <Route
@@ -74,7 +82,6 @@ function App() {
                 </PrivateRoute>
               }
             />
-
             {/* host routes */}
             <Route
               path="/host/events"
@@ -92,7 +99,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-             <Route
+            <Route
               path="/booked"
               element={
                 <PrivateRoute role="host">
@@ -125,7 +132,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-             <Route
+            <Route
               path="/my-tickets"
               element={
                 <PrivateRoute role="attendee">
@@ -133,18 +140,12 @@ function App() {
                 </PrivateRoute>
               }
             />
-              <Route
+            <Route
               path="/payment/:id"
               element={
-                <PrivateRoute role="attendee" >
+                <PrivateRoute role="attendee">
                   <StripePaymentForm />
                 </PrivateRoute>
-              }
-            />
-              <Route
-              path="*"
-              element={
-                  <PageNotFound/>
               }
             />
           </Routes>

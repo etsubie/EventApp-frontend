@@ -4,14 +4,14 @@ import { fetchUsers, deleteUserapi } from "../../api/users";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "../../Context/TostContext";
 import { Modal, Button } from "flowbite-react";
-import { Trash2 } from "lucide-react";
+import { Loader, Trash2 } from "lucide-react";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false); // Modal state
+  const [showModal, setShowModal] = useState(false); 
   const [selectedUser, setSelectedUser] = useState(null); // Store the user to delete
   const addToast = useToast();
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ const UsersTable = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div><Loader/></div>;
   }
 
   return (

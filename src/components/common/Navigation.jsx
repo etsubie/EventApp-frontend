@@ -1,21 +1,20 @@
+import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Button, Modal } from "flowbite-react";
 import logo from "../../images/d.jpg";
-import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../Context/AuthContext";
 import { logoutUser } from "../../api/auth";
-import { Search } from "lucide-react";
 
 export function Navigation() {
-  const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState("title");
   const { token, user, setToken, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const fetchUser = async () => {
     if (!token) {
-      setUser(null); // User is logged out
+      setUser(null);
       return;
     }
 
@@ -27,7 +26,6 @@ export function Navigation() {
       });
 
       const data = await res.json();
-
       if (res.ok) {
         setUser({
           ...data,
@@ -49,62 +47,101 @@ export function Navigation() {
 
   const handleLogout = async () => {
     try {
-      const data = await logoutUser();
-      if (data?.message) {
-        localStorage.removeItem("token"); // Clear the token
-        setToken(null); // Clear the token in context
-        setUser(null); // Clear user data on logout
-        navigate('/');
-      } else {
-        console.error('Logout error:', data);
-      }
+      await logoutUser(token);
+      setToken(null);
+      setUser(null);
+      navigate('/')
     } catch (error) {
-      console.error('Logout failed:', error.message);
+      console.error("Logout failed:", error);
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    navigate(`/attendee/events?${searchType}=${encodeURIComponent(term)}`);
   };
 
   return (
     <Navbar fluid className="px-6 text-gray-100 bg-gray-800 bg-opacity-50">
-      <Navbar.Brand as={Link} to="/">
-        <img src={logo} className="mr-3 h-6 sm:h-9" alt="Logo" />
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-          Events
-        </span>
-      </Navbar.Brand>
-      <div className="flex space-x-4 items-center">
-        {user?.role === 'attendee' && (
-          <div className="relative">
+      {!user && (
+        <Navbar.Brand as={Link} to="/">
+          <img src={logo} className="mr-3 h-6 sm:h-9" alt="Logo" />
+          <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+            Events
+          </span>
+        </Navbar.Brand>
+      )}
+      {user?.role === "admin" && (
+        <Navbar.Brand as={Link} to="/admin/overview">
+          <img src={logo} className="mr-3 h-6 sm:h-9" alt="Logo" />
+          <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+            Events
+          </span>
+        </Navbar.Brand>
+      )}
+      {user?.role === "attendee" && (
+        <Navbar.Brand as={Link} to="/attendee/events">
+          <img src={logo} className="mr-3 h-6 sm:h-9" alt="Logo" />
+          <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+            Events
+          </span>
+        </Navbar.Brand>
+      )}
+      {user?.role === "host" && (
+        <Navbar.Brand as={Link} to="/host/events">
+          <img src={logo} className="mr-3 h-6 sm:h-9" alt="Logo" />
+          <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+            Events
+          </span>
+        </Navbar.Brand>
+      )}
+      <div className="flex flex-col md:flex-row items-center md:order-2 space-x-0 md:space-x-4 space-y-4 md:space-y-0">
+        {user?.role === "attendee" && (
+          <>
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+              className="bg-gray-700 text-white rounded-lg pl-2 pr-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="title">Title</option>
+              <option value="location">Location</option>
+              <option value="category">Category</option>
+              <option value="date">Date</option>
+            </select>
+
             <input
               type="text"
-              placeholder="Search events..."
+              placeholder={`Search by ${searchType}...`}
               className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={handleSearch}
               value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && handleSearch(e.target.value)
+              }
             />
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
-          </div>
+          </>
         )}
         {user ? (
           <>
-            {user.role === 'host' && (
-              <Link to='/events/create'>Create Events</Link>
+            {user.role === "attendee" && (
+              <Link to="/my-tickets">
+                <Button className="text-white bg-blue-600 hover:bg-blue-700">
+                  My Tickets
+                </Button>
+              </Link>
             )}
-            {user.role === 'attendee' && (
-              <Link to='/my-tickets'>My Tickets</Link>
-            )}
-            <Button className="bg-red-800 border-none hover:border-none" onClick={handleLogout}>
+            <Button
+              className="bg-red-800 border-none hover:border-none"
+              onClick={handleLogout}
+            >
               Logout
             </Button>
             <div className="flex flex-wrap gap-2">
-              <div 
+              <div
                 className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-semibold cursor-pointer"
-                onClick={() => setShowModal(true)} 
+                onClick={() => setShowModal(true)}
               >
-                {user.name?.charAt(0) || 'U'}
+                {user.name?.charAt(0) || "U"}
               </div>
             </div>
           </>
@@ -114,17 +151,29 @@ export function Navigation() {
           </Link>
         )}
       </div>
-      <Modal show={showModal} size="md" popup={true} onClose={() => setShowModal(false)} className="flex justify-end">
+      <Modal
+        show={showModal}
+        size="md"
+        popup={true}
+        onClose={() => setShowModal(false)}
+        className="flex justify-end m-6 bg-blue-800"
+      >
         <Modal.Header />
         <Modal.Body>
           {user ? (
             <div className="text-center">
-              <Link to={`/profile/${user.id}`} className="text-blue-800" onClick={() => setShowModal(false)}>
+              <Link
+                to={`/profile/${user.id}`}
+                className="text-blue-800"
+                onClick={() => setShowModal(false)}
+              >
                 View Profile
               </Link>
             </div>
           ) : (
-            <div className="text-center text-gray-500">No user data available</div>
+            <div className="text-center text-gray-500">
+              No user data available
+            </div>
           )}
         </Modal.Body>
       </Modal>
