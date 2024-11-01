@@ -45,7 +45,7 @@ export function Register() {
             navigate("/host/events");
             break;
           case "attendee":
-            navigate("/attendee/events");
+            navigate("/events");
             break;
           default:
             console.error("Unknown role:", data.role);

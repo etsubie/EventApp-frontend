@@ -2,8 +2,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button } from "flowbite-react";
 import { AuthContext } from "../Context/AuthContext";
-import R from "../images/R.jpg";
-import { ArrowBigLeft, ArrowUp, CalendarIcon, Loader, MapPinIcon } from "lucide-react";
+import { ArrowBigLeft, CalendarIcon, MapPinIcon, Loader } from "lucide-react";
 import { fetchEventapi } from "../api/events";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../Context/TostContext";
@@ -19,7 +18,7 @@ const EventDetailsPage = () => {
   const { id } = useParams();
   const [hasApproved, setHasApproved] = useState(false);
   const [hasRejected, setHasRejected] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false); 
 
   useEffect(() => {
     const getEvent = async () => {
@@ -45,19 +44,20 @@ const EventDetailsPage = () => {
   if (error) {
     return <p className="text-red-500">Error: {error}</p>;
   }
-  if(loading){<div><Loader/></div>}
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen"><Loader /></div>;
+  }
+
   const handleApprove = async (id) => {
-    // Check if event is already approved
     if (hasApproved) {
       addToast("You have already approved this event.", "info");
       return;
     }
 
     try {
-      const response = await Approveapi(id);
-      // Update state to reflect approval
+      await Approveapi(id);
       setHasApproved(true);
-
       addToast("Approved successfully!", "success");
     } catch (error) {
       console.error("Update error:", error);
@@ -85,106 +85,118 @@ const EventDetailsPage = () => {
   };
 
   return (
-    <div className="p-8 flex flex-col h-full space-y-5 w-full bg-white">
-      <div className="w-full p-0 sm:h-72">
+    <div className="flex flex-col w-full max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <div className="flex flex-col lg:flex-row rounded-lg w-full gap-6 p-4 shadow-xl">
         <img
-          src={ `${imageUrl}/${event.image}`}
-          alt="Fallback Image"
-          className="w-full h-full object-cover"
+          src={`${imageUrl}/${event.image}`}
+          alt=' Image'
+          className="h-[400px] w-96 rounded-lg object-cover shadow-md"
         />
-      </div>
-      <ArrowBigLeft onClick={()=> navigate(-1)} className="bg-gray-100 cursor-pointer"/>
-      <h1 className="font-bold text-xl">{event.title || "Event Title"}</h1>
-      <div className="flex flex-col">
-        <span className=" text-blue-900 font-bold ">
-         Price: ${event.ticket_price || "Price not available"}
-        </span>
-        <span >
-          Category: {event.category ? event.category.name : "No category"}
-        </span>
-      </div>
-      {user?.role !== "host" && (
-        <span className="font-thin">
-          Created by {event.user?.name || "Unknown"}{" "}
-        </span>
-      )}
-      <div className="flex space-x-3">
-        <CalendarIcon className="h-5 w-6" />
-        <span>
-          {new Date(event.start_date).toLocaleString("en-US", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          }) +
-            " - " +
-            new Date(event.end_date).toLocaleString("en-US", {
-              dateStyle: "medium",
-              timeStyle: "short",
-            }) || "Date"}
-        </span>
-      </div>
-      <div className="flex space-x-3">
-        <MapPinIcon className="h-6 w-6" />
-        <span>{event.location || "Location"}</span>
-      </div>
+        <div className="w-full h-full flex flex-col justify-between">
+          <div className="flex flex-col gap-4 w-full">
+            <ArrowBigLeft onClick={() => navigate(-1)} className="bg-gray-100 cursor-pointer p-2 rounded hover:bg-gray-200 transition duration-300" />
+            <h1 className="font-bold text-2xl text-gray-800">{event.title || "Event Title"}</h1>
+            <div className="flex flex-col">
+              <span className="text-blue-800 font-bold text-lg">
+                Price: ${event.ticket_price || "Price not available"}
+              </span>
+              <span className="font-semibold text-gray-700">
+                Category: {event.category ? event.category.name : "No category"}
+              </span>
+            </div>
+            {user?.role !== "host" && (
+              <span className="font-thin text-gray-600">
+                Created by {event.user?.name || "Unknown"}
+              </span>
+            )}
+            <div className="flex items-center space-x-3">
+              <CalendarIcon className="h-5 w-5 text-gray-600" />
+              <span className="text-gray-700">
+                {new Date(event.start_date).toLocaleString("en-US", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }) + " - " + new Date(event.end_date).toLocaleString("en-US", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }) || "Date"}
+              </span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <MapPinIcon className="h-5 w-5 text-gray-600" />
+              <span className="text-gray-700">{event.location || "Location"}</span>
+            </div>
+          </div>
 
-      {user?.role === "admin" ? (
-        <div className="flex space-x-4">
-          <Button
-            className="bg-blue-800 border-none"
-            onClick={() => handleApprove(event.id)}
-            disabled={hasApproved}
+          {/* Action Buttons */}
+          {user?.role === "admin" ? (
+            <div className="flex space-x-4 mt-4">
+              <Button
+                className={`bg-blue-800 border-none ${hasApproved ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => handleApprove(event.id)}
+                disabled={hasApproved}
+              >
+                {loading ? "Approving..." : "Approve"}
+              </Button>
+              <Button
+                className={`bg-red-600 border-none ${hasRejected ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => handleReject(event.id)}
+                disabled={hasRejected}
+              >
+                {loading ? "Rejecting..." : "Reject"}
+              </Button>
+            </div>
+          ) : user?.role === "host" ? null :
+            user?.role === "attendee" ? (
+              event.remaining_capacity > 0 && new Date(event.end_date) > new Date() ? (
+                <Button className="bg-blue-800 border-none w-28 mt-4" onClick={handleBook}>
+                  Buy Ticket
+                </Button>
+              ) : (
+                <span className="text-red-600 font-bold mt-4">
+                  Tickets are not available
+                </span>
+              )
+            ) : !user ? (
+              event.remaining_capacity > 0 && new Date(event.end_date) > new Date() ? (
+                <Link
+                  to="/login"
+                  className="bg-blue-600 border-none w-28 text-white p-2 rounded text-center mt-4 inline-block"
+                >
+                  Get Tickets
+                </Link>
+              ) : (
+                <span className="text-red-600 font-bold mt-4">
+                  Tickets are not available
+                </span>
+              )
+            ) : null}
+
+          {/* Button to show description in a modal */}
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="mt-4 bg-gray-300 text-black px-4 py-2 rounded transition duration-300 hover:bg-gray-400"
           >
-            {loading ? "Approving" : "Approve"}
-          </Button>
-          <Button
-            className="bg-red-900 border-none"
-            onClick={() => handleReject(event.id)}
-            disabled={hasRejected}
-          >
-            {loading ? "Rejecting" : "Reject"}
-          </Button>
+            About Event
+          </button>
         </div>
-      ) : user?.role === "host" ? (
-        <></>
-      ) : user?.role === "attendee" ? (
-        event.remaining_capacity > 0 &&
-        new Date(event.end_date) > new Date() ? (
-          <Button className="bg-blue-800 border-none w-28" onClick={handleBook}>
-            Buy
-          </Button>
-        ) : (
-          <span className="text-red-600 font-bold">
-            Tickets are not available
-          </span>
-        )
-      ) : !user ? (
-        event.remaining_capacity > 0 &&
-        new Date(event.end_date) > new Date() ? (
-          <Link
-            to="/login"
-            className="bg-blue-600 border-none w-28 text-white p-2 rounded text-center"
-          >
-            Get Tickets
-          </Link>
-        ) : (
-          <span className="text-red-600 font-bold">
-            Tickets are not available
-          </span>
-        )
-      ) : null}
+      </div>
 
-      <div className="flex flex-col space-y-2">
-        <h1 className="font-semibold">Description</h1>
-        <p>{event.description || "No description available"}</p>
-      </div>
-      <div className="flex justify-end">
-        <Button
-          className="bg-gray-200 text-black border-none w-28 mb-10 flex"
-          onClick={() => window.scrollTo(0, 0)}
-        >
-          <ArrowUp />
-        </Button>
-      </div>
+      {/* Modal for Event Description */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black opacity-50" onClick={() => setIsModalOpen(false)} />
+          <div className="bg-white rounded-lg shadow-lg p-6 z-10 w-11/12 md:w-1/2">
+            <h2 className="text-xl font-bold mb-4">{event.title || "Event Title"}</h2>
+            <p>{event.description || "No description available"}</p>
+            <button
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded transition duration-300 hover:bg-blue-700"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

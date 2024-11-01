@@ -1,7 +1,7 @@
 const API_URL = "/api/public";
 
 
-export const fetchEventsapi = async () => {
+export const fetchEventpapi = async () => {
   try {
     const response = await fetch(API_URL);
     const data = await response.json();

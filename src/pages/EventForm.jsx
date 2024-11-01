@@ -16,7 +16,7 @@ export function EventForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const { id } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const { user } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
@@ -28,8 +28,8 @@ export function EventForm() {
     end_date: new Date(),
     capacity: "",
     category_id: null,
-    image: "",  // This holds the Base64 string
-    imagePreviewUrl: "", // This holds the image preview URL
+    image: "",  // Base64 image string
+    imagePreviewUrl: "", // Image preview URL
   });
 
   useEffect(() => {
@@ -54,7 +54,6 @@ export function EventForm() {
         }
       }
     };
-
     getEvent();
   }, [id]);
 
@@ -72,15 +71,10 @@ export function EventForm() {
         start_date: formData.start_date.toISOString(),
         end_date: formData.end_date.toISOString(),
       };
+      setLoading(true);
       if (id) {
         await updateEventsapi(id, formattedData);
-
-        if (user?.role === "host") {
-          navigate("/host/events");
-        } else if (user?.role === "admin") {
-          navigate("/admin/events");
-        }
-
+        navigate(user?.role === "host" ? "/host/events" : "/admin/events");
         addToast("Event updated successfully!", "success");
       } else {
         await createEventapi(formattedData);
@@ -90,6 +84,8 @@ export function EventForm() {
     } catch (error) {
       console.error("Submission error:", error);
       setErrorMessage("Creating/updating event failed: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,12 +99,12 @@ export function EventForm() {
   };
 
   return (
-    <div className="flex flex-wrap h-full justify-center items-center w-full bg-white p-6">
-      <form className="w-full flex flex-col gap-4 text-black" onSubmit={handleSubmit}>
-        <h1 className="text-xl font-bold text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+      <form className="w-full flex flex-col gap-5 max-w-lg bg-white shadow-md rounded-lg p-8" onSubmit={handleSubmit}>
+        <h1 className="text-2xl font-bold text-center mb-4">
           {id ? "Update Event" : "Create Event"}
         </h1>
-        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+        {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
 
         <TextInput
           type="text"
@@ -120,27 +116,21 @@ export function EventForm() {
         />
 
         <CategoryDropdown
-          onCategorySelect={(categoryId) =>
-            setFormData({ ...formData, category_id: categoryId })
-          }
+          onCategorySelect={(categoryId) => setFormData({ ...formData, category_id: categoryId })}
           initialCategoryId={formData.category_id} // Pass the selected category ID
         />
 
         <Textarea
-          rows="10"
+          rows="4"
           placeholder="Description"
           value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
 
         <TextInput
           type="text"
           value={formData.location}
-          onChange={(e) =>
-            setFormData({ ...formData, location: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
           placeholder="Location"
           required
           shadow
@@ -149,9 +139,7 @@ export function EventForm() {
         <TextInput
           type="number"
           value={formData.ticket_price}
-          onChange={(e) =>
-            setFormData({ ...formData, ticket_price: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, ticket_price: e.target.value })}
           placeholder="Price"
           shadow
         />
@@ -159,39 +147,37 @@ export function EventForm() {
         <TextInput
           type="number"
           value={formData.capacity}
-          onChange={(e) =>
-            setFormData({ ...formData, capacity: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
           placeholder="Capacity"
           shadow
         />
 
-        <label>Start Date and Time</label>
+        <label className="block text-gray-700 mb-2">Start Date and Time</label>
         <DateTimePicker
           onChange={(value) => setFormData({ ...formData, start_date: value })}
           value={formData.start_date}
           format="y-MM-dd h:mm a"
           disableClock={false}
-          className="w-full bg-white"
+          className="w-full bg-white mb-4"
         />
 
-        <label>End Date and Time</label>
+        <label className="block text-gray-700 mb-2">End Date and Time</label>
         <DateTimePicker
           onChange={(value) => setFormData({ ...formData, end_date: value })}
           value={formData.end_date}
           format="y-MM-dd h:mm a"
           disableClock={false}
-          className="w-full bg-white border"
+          className="w-full bg-white mb-4"
         />
 
         {/* Image Preview */}
         {formData.imagePreviewUrl && (
           <div className="mt-4">
-            <label>Image Preview:</label>
+            <label className="block text-gray-700 mb-2">Image Preview:</label>
             <img
               src={formData.imagePreviewUrl}
               alt="Selected"
-              className="w-32 h-32 object-cover mt-2"
+              className="w-full h-32 object-cover rounded mb-4"
             />
           </div>
         )}
@@ -203,17 +189,11 @@ export function EventForm() {
           onDone={handleImageUpload}
         />
 
-        <div className="flex space-x-4 mb-10">
-          <Button className="bg-blue-950 w-full" type="submit">
-            {loading
-              ? id
-                ? "Updating..."
-                : "Creating..."
-              : id
-              ? "Update"
-              : "Create"}
+        <div className="flex space-x-4 mb-6">
+          <Button className="bg-blue-500 w-full" type="submit" disabled={loading}>
+            {loading ? (id ? "Updating..." : "Creating...") : (id ? "Update" : "Create")}
           </Button>
-          <Button className="bg-red-900 w-full" onClick={() => navigate(-1)}>
+          <Button className="bg-red-500 w-full" onClick={() => navigate(-1)}>
             Cancel
           </Button>
         </div>

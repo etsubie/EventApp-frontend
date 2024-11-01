@@ -74,7 +74,7 @@ export function CategoryDropdown({ onCategorySelect, initialCategoryId }) {
         </option>
       </select>
 
-      <Modal show={isModalOpen} onClose={() => setModalOpen(false)} className="p-20">
+      <Modal show={isModalOpen} onClose={() => setModalOpen(false)} className="p-20 bg-blue-800">
         <Modal.Header>Create New Category</Modal.Header>
         <Modal.Body>
           <TextInput

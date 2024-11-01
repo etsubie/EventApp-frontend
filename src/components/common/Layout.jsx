@@ -8,14 +8,21 @@ const Layout = ({ children }) => {
 
   return (
     <div className="flex flex-col h-screen">
-        <div className='bg-blue-950'>
-        <Navigation/>
-        </div>
+        {user?.role === "attendee" &&(
+          <div className=''>
+          <Navigation/>
+          </div>
+        )}
+        {!user &&(
+           <div className=''>
+           <Navigation/>
+           </div>
+        )}
       <div className="flex flex-1">
-        <aside className="bg-blue-950 text-white">
+        <aside className=" bg-gray-800 text-white">
         {user && (user.role === "admin" || user.role === "host") && <Sidebar />}
         </aside>
-        <main className="flex-1 overflow-auto p-4 bg-gray-200 text-black">
+        <main className="flex-1 overflow-auto p-6 text-black">
           {children}
         </main>
       </div>

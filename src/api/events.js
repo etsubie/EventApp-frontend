@@ -24,7 +24,13 @@ export const fetchEventsapi = async (params = {}) => {
     return []; 
   }
 };
-
+export const getEventsByCategory = async (category) => {
+  const response = await fetch(`/api/events/category/${category}`);
+  if (!response.ok) {
+    throw new Error(`No events found for category: ${category}`);
+  }
+  return await response.json();
+};
 export const fetchEventapi = async (id) => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {

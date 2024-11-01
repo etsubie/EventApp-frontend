@@ -51,7 +51,7 @@ const DangerZone = () => {
       </motion.div>
 
       {/* Flowbite Confirmation Modal */}
-      <Modal show={showModal} size="md" popup={true} onClose={() => setShowModal(false)}>
+      <Modal show={showModal} size="md" popup={true} onClose={() => setShowModal(false)} className="bg-blue-800">
         <Modal.Header />
         <Modal.Body>
           <div className="text-center">

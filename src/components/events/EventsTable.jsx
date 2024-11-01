@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { Edit, Loader, Search, Trash2 } from "lucide-react";
 import { useToast } from "../../Context/TostContext";
 import { deletEventapi, fetchEventsapi } from "../../api/events";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal, Button } from "flowbite-react";
+import { AuthContext } from "../../Context/AuthContext";
 
 const EventsTable = () => {
   const [originalEvents, setOriginalEvents] = useState([]);
@@ -17,6 +18,7 @@ const EventsTable = () => {
 
   const addToast = useToast();
   const navigate = useNavigate();
+  const {user} = useContext(AuthContext)
 
   useEffect(() => {
     const getEvents = async () => {
@@ -71,7 +73,7 @@ const EventsTable = () => {
     setShowModal(true); // Open the modal
   };
 
-  if (loading) return <div><Loader/></div>;
+  if (loading) return <div><Loader className="animate-spin"/></div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -113,9 +115,11 @@ const EventsTable = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
                 Location
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
-                Actions
-              </th>
+             {user?.role === 'host' && (
+               <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
+               Actions
+             </th>
+             )}
             </tr>
           </thead>
 
@@ -145,7 +149,8 @@ const EventsTable = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {event.location}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex">
+                  {user?.role === 'host' && (
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex">
                     <Link
                       to={`/events/edit/${event.id}`}
                       className="text-indigo-400 hover:text-indigo-300 mr-2"
@@ -163,6 +168,7 @@ const EventsTable = () => {
                       <Trash2 size={18} />
                     </button>
                   </td>
+                  )}
                 </motion.tr>
               ))
             ) : (

@@ -28,7 +28,7 @@ export function Login() {
       } else if (data.role === "host") {
         navigate("/host/events");
       } else if (data.role === "attendee") {
-        navigate("/attendee/events");
+        navigate("/events");
       }
   
     } catch (error) {

@@ -1,8 +1,9 @@
 import { Button, TextInput, Dropdown } from "flowbite-react";
-import {  useEffect, useState } from "react";
+import {  useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getUserByIdApi, updateUserapi } from "../api/users";
 import { useToast } from "../Context/TostContext";
+import { AuthContext } from "../Context/AuthContext";
 
 export function Profiledata() {
   const addToast = useToast();
@@ -13,6 +14,7 @@ export function Profiledata() {
   });
   const { id } = useParams();
   const navigate = useNavigate();
+  const {user} = useContext(AuthContext)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,7 +23,7 @@ export function Profiledata() {
         setFormData({
           name: data.name,
           email: data.email,
-          role:  data.role,
+          role:  data.role = user?.role,
         });
       } catch (error) {
         console.error("Failed to fetch user data:", error);

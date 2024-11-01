@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "flowbite-react";
 import { fetchEventapi } from "../api/events";
+import { useToast } from "../Context/TostContext";
 
 const stripePromise = loadStripe(
   "pk_test_51QC0xjP70QwNGlw2r54IRSDdW0M3yh1Zn8RubgxQR5cPMhjmDLhRqVNHNhoTUyBzYy1tZ23DtxMMslol4aas7RYL00k2L2Znlu"
@@ -18,7 +19,8 @@ const PaymentForm = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(null);
   const [error, setError] = useState(null);
   const { id } = useParams();
-
+  const {addToast} = useToast()
+const navigte = useNavigate()
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
@@ -32,7 +34,7 @@ const PaymentForm = () => {
     fetchEventDetails();
   }, [id]);
 
-const handleSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
   
     if (!stripe || !elements) {
@@ -42,6 +44,7 @@ const handleSubmit = async (event) => {
     const cardElement = elements.getElement(CardElement);
   
     try {
+      setLoading(true); 
       const { error } = await stripe.createPaymentMethod({
         type: "card",
         card: cardElement,
@@ -49,26 +52,32 @@ const handleSubmit = async (event) => {
   
       if (error) {
         setError(error.message);
-        return; 
-      }  
-      //confirm booking
+        setLoading(false); 
+        return;
+      }
+  
+      // Confirm booking
       const response = await fetch('/api/confirm-booking', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ event_id: id }), 
+        body: JSON.stringify({ event_id: id }),
       });
   
       if (response.ok) {
         const data = await response.json();
-        setPaymentSuccess(`Payment successful and booking confirmed! you will receive email `);
+        navigte(-1)
+
+        addToast(`Payment successful and booking confirmed! You will receive an email.`, "success");
       } else {
         const errorData = await response.json();
         setError(errorData.message || 'Booking failed.');
       }
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false); // Reset loading in the finally block to ensure it's executed
     }
   };
   
