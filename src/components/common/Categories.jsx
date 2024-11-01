@@ -15,7 +15,7 @@ const Categories = () => {
   );
 
   return (
-    <div className="flex gap-5 items-center justify-center">
+    <div className="flex gap-5 items-center justify-center flex-wrap">
       <div className='flex gap-5'>
         <Link
           className="border text-orange-500 font-semibold rounded-lg flex justify-center items-center p-3 px-6 shadow-xl"

@@ -6,6 +6,7 @@ import { deletEventapi, fetchEventsapi } from "../../api/events";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal, Button } from "flowbite-react";
 import { AuthContext } from "../../Context/AuthContext";
+import Pagination from "../common/Pagination";
 
 const EventsTable = () => {
   const [originalEvents, setOriginalEvents] = useState([]);
@@ -13,12 +14,14 @@ const EventsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false); 
-  const [selectedEvent, setSelectedEvent] = useState(null); 
-
+  const [showModal, setShowModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8
+  
   const addToast = useToast();
   const navigate = useNavigate();
-  const {user} = useContext(AuthContext)
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const getEvents = async () => {
@@ -62,16 +65,22 @@ const EventsTable = () => {
       await deletEventapi(eventId);
       setEvents((prev) => prev.filter((event) => event.id !== eventId));
       addToast("Event deleted successfully!", "success");
-      setShowModal(false); // Close the modal after deletion
+      setShowModal(false);
     } catch (error) {
       addToast("Failed to delete event. Please try again.", "error");
     }
   };
 
   const openDeleteModal = (event) => {
-    setSelectedEvent(event); // Store the selected event to be deleted
-    setShowModal(true); // Open the modal
+    setSelectedEvent(event);
+    setShowModal(true);
   };
+
+  const totalPages = Math.ceil(events.length / itemsPerPage);
+  const displayedEvents = events.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (loading) return <div><Loader className="animate-spin"/></div>;
   if (error) return <div>Error: {error}</div>;
@@ -100,32 +109,18 @@ const EventsTable = () => {
         <table className="min-w-full divide-y divide-gray-300">
           <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
-                Title
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
-                Price
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
-                Capacity
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
-                Location
-              </th>
-             {user?.role === 'host' && (
-               <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
-               Actions
-             </th>
-             )}
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Title</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Category</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Price</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Capacity</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Location</th>
+              {user?.role === 'host' && <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Actions</th>}
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-300">
-            {events.length > 0 ? (
-              events.map((event) => (
+            {displayedEvents.length > 0 ? (
+              displayedEvents.map((event) => (
                 <motion.tr
                   key={event.id}
                   onClick={() => handleRowClick(event.id)}
@@ -134,40 +129,32 @@ const EventsTable = () => {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-950">
-                    {event.title}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-950">{event.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {event.category ? event.category.name : "No category"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${event.ticket_price}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {event.capacity}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {event.location}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${event.ticket_price}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{event.capacity}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{event.location}</td>
                   {user?.role === 'host' && (
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex">
-                    <Link
-                      to={`/events/edit/${event.id}`}
-                      className="text-indigo-400 hover:text-indigo-300 mr-2"
-                      onClick={(e) => e.stopPropagation()} // Prevent row click
-                    >
-                      <Edit size={18} />
-                    </Link>
-                    <button
-                      className="text-red-400 hover:text-red-300"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent row click
-                        openDeleteModal(event); // Open delete modal with event details
-                      }}
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
+                      <Link
+                        to={`/events/edit/${event.id}`}
+                        className="text-indigo-400 hover:text-indigo-300 mr-2"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Edit size={18} />
+                      </Link>
+                      <button
+                        className="text-red-400 hover:text-red-300"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(event);
+                        }}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
                   )}
                 </motion.tr>
               ))
@@ -181,6 +168,17 @@ const EventsTable = () => {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          className="mt-4"
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          showIcons
+          totalPages={totalPages}
+        />
+      )}
+
       <Modal show={showModal} size="md" popup={true} onClose={() => setShowModal(false)}>
         <Modal.Header />
         <Modal.Body>

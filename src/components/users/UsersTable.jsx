@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { fetchUsers } from "../../api/users";
 import { useToast } from "../../Context/TostContext";
 import { Loader } from "lucide-react";
+import Pagination from "../common/Pagination";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
@@ -10,6 +11,14 @@ const UsersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const addToast = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const displayedUsers = users.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   useEffect(() => {
     const getUsers = async () => {
@@ -70,7 +79,7 @@ const UsersTable = () => {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y  divide-gray-300">
+        <table className="min-w-full divide-y divide-gray-300">
           <thead>
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
@@ -85,8 +94,8 @@ const UsersTable = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-300">
-            {users.length > 0 ? (
-              users.map((user) => (
+            {displayedUsers.length > 0 ? (
+              displayedUsers.map((user) => (
                 <motion.tr
                   key={user.id}
                   initial={{ opacity: 0 }}
@@ -119,13 +128,22 @@ const UsersTable = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center">
+                <td colSpan="3" className="text-center">
                   No users found.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        {totalPages > 1 && (
+          <Pagination
+            className="mt-4"
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            showIcons
+            totalPages={totalPages}
+          />
+        )}
       </div>
     </motion.div>
   );

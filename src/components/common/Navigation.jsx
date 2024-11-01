@@ -61,7 +61,6 @@ export function Navigation() {
     setSearchTerm(term);
     navigate(`/events?${searchType}=${encodeURIComponent(term)}`);
   };
-
   const handleClickOutside = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
       setShowModal(false);
@@ -85,45 +84,45 @@ export function Navigation() {
       <div className="flex flex-col sm:flex-row justify-between items-center">
         <div className="flex items-center mb-2 sm:mb-0">
           <img src={logo} className="h-10 rounded-full" alt="" />
-             <Link to="/">
-                <span className="self-center whitespace-nowrap text-2xl font-bold text-orange-500 dark:text-white">
-                  Events
-                </span>
-              </Link>
+          <Link to="/">
+            <span className="self-center whitespace-nowrap text-2xl font-bold text-orange-500 dark:text-white">
+              Events
+            </span>
+          </Link>
         </div>
- {/* Search Container */}
- <div className="flex sm:flex-row mt-2 items-center border w-1/2 rounded-full border-gray-500">
-        <select
-          value={searchType}
-          onChange={(e) => setSearchType(e.target.value)}
-          className="outline-none border-none rounded-l-full text-gray-500"
-        >
-          <option value="title">Title</option>
-          <option value="location">Location</option>
-          <option value="category">Category</option>
-          <option value="date">Date</option>
-        </select>
+        {/* Search Container */}
+        <div className="flex sm:flex-row mt-2 items-center border w-1/2 rounded-full border-gray-500">
+          <select
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+            className="outline-none border-none rounded-l-full text-gray-500"
+          >
+            <option value="title">Title</option>
+            <option value="location">Location</option>
+            <option value="category">Category</option>
+            <option value="date">Date</option>
+          </select>
 
-       <div className="flex items-center w-full text-gray-500">
-        <SearchIcon/>
-         <input
-          type="text"
-          placeholder={`Search by ${searchType}...`}
-          className="placeholder-gray-500 w-full outline-none rounded-r-full border-none"
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          onKeyDown={(e) =>
-            e.key === "Enter" && handleSearch(e.target.value)
-          }
-        />
-       </div>
-      </div>
+          <div className="flex items-center w-full text-gray-500">
+            <SearchIcon />
+            <input
+              type="text"
+              placeholder={`Search by ${searchType}...`}
+              className="placeholder-gray-500 w-full outline-none rounded-r-full border-none"
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && handleSearch(e.target.value)
+              }
+            />
+          </div>
+        </div>
         <div className="flex items-center">
           {user ? (
             <>
               {user.role === "attendee" && (
                 <Link to="/my-tickets" className="mr-2">
-                    My Tickets
+                  My Tickets
                 </Link>
               )}
               <div
@@ -135,7 +134,9 @@ export function Navigation() {
             </>
           ) : (
             <Link to="/login">
-              <button className="text-gray-700 bg-gray-200 px-4 py-2 rounded-md">Login</button>
+              <button className="text-gray-700 bg-gray-200 px-4 py-2 rounded-md">
+                Login
+              </button>
             </Link>
           )}
         </div>
