@@ -11,7 +11,8 @@ export const useToast = () => {
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
-  const addToast = (message, type = "success") => {// default type success
+  const addToast = (message, type = "success") => {
+    // default type success
     const id = new Date().getTime();
     setToasts((prev) => [...prev, { id, message, type }]);
 
@@ -19,7 +20,6 @@ export const ToastProvider = ({ children }) => {
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 3000);
-    
   };
 
   const getToastStyles = (type) => {

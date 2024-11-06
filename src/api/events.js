@@ -1,15 +1,20 @@
 const API_URL = "/api/events";
 
-export const fetchEventsapi = async (params = {}) => {
-  try {
-    const url = new URL(API_URL, window.location.origin);
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+export const fetchEventsapi = async () => {
+  const headers = {};
+  const token = localStorage.getItem("token");
 
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  try {
+    const response = await fetch(API_URL, { headers });
+
+    if (!response.ok) {
+      console.error("Failed to fetch events. Status:", response.status);
+      throw new Error("Unauthorized or server error.");
+    }
 
     const data = await response.json();
 
@@ -17,13 +22,14 @@ export const fetchEventsapi = async (params = {}) => {
       throw new Error("Unexpected data format from server.");
     }
 
-    return data.events; 
+    return data.events;
 
   } catch (error) {
-    console.error("Error in fetch events:", error);
-    return []; 
+    console.error("Error fetching events:", error);
+    return [];
   }
 };
+
 export const getEventsByCategory = async (category) => {
   const response = await fetch(`/api/events/category/${category}`);
   if (!response.ok) {

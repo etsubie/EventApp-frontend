@@ -8,7 +8,6 @@ import { CategoryDropdown } from "../components/events/CategoreyDropdown";
 import "react-datetime-picker/dist/DateTimePicker.css";
 import "../style/custom-datetime-picker.css";
 import FileBase from 'react-file-base64';
-import { AuthContext } from "../Context/AuthContext";
 import { imageUrl } from "../api/image";
 
 export function EventForm() {
@@ -17,7 +16,6 @@ export function EventForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { user } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -73,12 +71,12 @@ export function EventForm() {
       };
       setLoading(true);
       if (id) {
-        await updateEventsapi(id, formattedData);
-        navigate(user?.role === "host" ? "/host/events" : "/admin/events");
-        addToast("Event updated successfully!", "success");
+      const updata = await updateEventsapi(id, formattedData);
+      addToast(updata.message, "success");
+      navigate("/host/events");
       } else {
-        await createEventapi(formattedData);
-        addToast("Event created successfully!", "success");
+        const crdata = await createEventapi(formattedData);
+        addToast(crdata.message, "success");
         navigate("/host/events");
       }
     } catch (error) {

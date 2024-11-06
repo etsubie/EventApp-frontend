@@ -37,9 +37,9 @@ const Anime = () => {
     );
   };
 
-  if (loading) return <div className="flex justify-center"><Loader /></div>;
+  if (loading) return <div className="flex justify-center"><Loader className='animate-spin'/></div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
-
+  
   return (
     <div className="w-full lg:h-80 md:h-48 p-0 relative">
       <div className="flex w-full h-full justify-center items-center overflow-hidden">
@@ -55,7 +55,7 @@ const Anime = () => {
               className="flex-shrink-0 w-full" 
             >
               <img
-                src={`${imageUrl}/${event?.image || event?.event?.image}`}
+                src={`${imageUrl}/${event?.image}`}
                 alt={`Event ${index + 1}`}
                 className="w-full h-full rounded object-cover"
                 style={{ minWidth: "100%" }} 

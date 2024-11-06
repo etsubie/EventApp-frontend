@@ -8,9 +8,10 @@ import {
   LogOutIcon,
 } from "lucide-react";
 import { useContext, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContext";
+import logo from "../../images/logo2.jpg"; 
 import { logoutUser } from "../../api/auth";
 
 const Sidebar = () => {
@@ -104,7 +105,27 @@ const Sidebar = () => {
       animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
       <div className="h-full backdrop-blur-md p-4 flex flex-col border-r shadow border-gray-500">
-        <motion.button
+       <div className="flex justify-center gap-4 items-center">
+       <img
+          src={logo}
+          alt="Logo"
+          className="h-10 w-auto mb-2 rounded-full" 
+        />
+
+        {/* Display Events text based on sidebar state */}
+          {isSidebarOpen && (
+            <span
+              className="text-3xl font-bold mb-4 text-orange-500"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              Events
+            </span>
+          )}
+       </div>
+       <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -112,8 +133,7 @@ const Sidebar = () => {
         >
           <Menu size={24} />
         </motion.button>
-
-        <nav className="mt-8 flex-grow">
+        <nav className="mt-4 flex-grow">
           {SIDEBAR_ITEMS.map((item) =>
             item.onClick ? (
               <motion.div
@@ -125,19 +145,9 @@ const Sidebar = () => {
                   size={20}
                   style={{ color: item.color, minWidth: "20px" }}
                 />
-                <AnimatePresence>
-                  {isSidebarOpen && (
-                    <motion.span
-                      className="ml-4 whitespace-nowrap"
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: "auto" }}
-                      exit={{ opacity: 0, width: 0 }}
-                      transition={{ duration: 0.2, delay: 0.3 }}
-                    >
-                      {item.name}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+                <span className={`ml-4 ${isSidebarOpen ? 'block' : 'hidden'}`}>
+                  {item.name}
+                </span>
               </motion.div>
             ) : (
               <Link key={item.href} to={item.href}>
@@ -146,19 +156,9 @@ const Sidebar = () => {
                     size={20}
                     style={{ color: item.color, minWidth: "20px" }}
                   />
-                  <AnimatePresence>
-                    {isSidebarOpen && (
-                      <motion.span
-                        className="ml-4 whitespace-nowrap"
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: "auto" }}
-                        exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2, delay: 0.3 }}
-                      >
-                        {item.name}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
+                  <span className={`ml-4 ${isSidebarOpen ? 'block' : 'hidden'}`}>
+                    {item.name}
+                  </span>
                 </motion.div>
               </Link>
             )

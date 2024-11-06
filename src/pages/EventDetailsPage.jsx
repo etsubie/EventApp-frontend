@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button } from "flowbite-react";
 import { AuthContext } from "../Context/AuthContext";
-import { ArrowBigLeft, CalendarIcon, MapPinIcon, Loader } from "lucide-react";
+import { ArrowBigLeft, CalendarIcon, MapPinIcon, Loader, ArrowLeft } from "lucide-react";
 import { fetchEventapi } from "../api/events";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../Context/TostContext";
@@ -94,7 +94,7 @@ const EventDetailsPage = () => {
         />
         <div className="w-full h-full flex flex-col justify-between">
           <div className="flex flex-col gap-4 w-full">
-            <ArrowBigLeft onClick={() => navigate(-1)} className="bg-gray-100 cursor-pointer p-2 rounded hover:bg-gray-200 transition duration-300" />
+            <ArrowLeft onClick={() => navigate(-1)} className="bg-gray-100 cursor-pointer p-2 rounded h-9 w-20 hover:bg-gray-200 transition duration-300" />
             <h1 className="font-bold text-2xl text-gray-800">{event.title || "Event Title"}</h1>
             <div className="flex flex-col">
               <span className="text-blue-800 font-bold text-lg">

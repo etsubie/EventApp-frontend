@@ -12,6 +12,7 @@ export function Navigation() {
   const { token, user, setToken, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const modalRef = useRef(null);
+  const avatarRef = useRef(null);
 
   const fetchUser = async () => {
     if (!token) {
@@ -61,8 +62,9 @@ export function Navigation() {
     setSearchTerm(term);
     navigate(`/events?${searchType}=${encodeURIComponent(term)}`);
   };
+  
   const handleClickOutside = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
+    if (modalRef.current && !modalRef.current.contains(e.target) && !avatarRef.current.contains(e.target)) {
       setShowModal(false);
     }
   };
@@ -80,10 +82,10 @@ export function Navigation() {
   }, [showModal]);
 
   return (
-    <div className="border-b p-2 border-r-gray-100">
+    <div className=" bg-white border-b p-2 border-gray-300 fixed z-50 w-full">
       <div className="flex flex-col sm:flex-row justify-between items-center">
         <div className="flex items-center mb-2 sm:mb-0">
-          <img src={logo} className="h-10 rounded-full" alt="" />
+          <img src={logo} className="h-10 rounded-full" alt="Logo" />
           <Link to="/">
             <span className="self-center whitespace-nowrap text-2xl font-bold text-orange-500 dark:text-white">
               Events
@@ -117,7 +119,7 @@ export function Navigation() {
             />
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center relative" ref={avatarRef}>
           {user ? (
             <>
               {user.role === "attendee" && (
@@ -139,42 +141,42 @@ export function Navigation() {
               </button>
             </Link>
           )}
+          {showModal && (
+            <div
+              ref={modalRef}
+              className="absolute top-10 right-0 bg-white rounded-lg shadow-lg p-4 w-48"
+            >
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-600 hover:text-gray-900 text-xl font-bold float-right"
+              >
+                &times;
+              </button>
+              <div className="text-center">
+                {user ? (
+                  <>
+                    <Link
+                      to={`/profile/${user.id}`}
+                      className="text-blue-800 block mb-2 hover:text-blue-600 "
+                      onClick={() => setShowModal(false)}
+                    >
+                      View Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="text-red-800 hover:text-red-500 mt-2  w-full rounded"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-gray-500">No user data available</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      {showModal && (
-        <div
-          ref={modalRef}
-          className="justify-end mr-4 bg-white rounded-lg shadow-lg p-4 w-48"
-        >
-          <button
-            onClick={() => setShowModal(false)}
-            className="text-gray-600 hover:text-gray-900 text-xl font-bold float-right"
-          >
-            &times;
-          </button>
-          <div className="text-center">
-            {user ? (
-              <>
-                <Link
-                  to={`/profile/${user.id}`}
-                  className="text-blue-800 block mb-2"
-                  onClick={() => setShowModal(false)}
-                >
-                  View Profile
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-red-800 hover:text-red-600"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <p className="text-gray-500">No user data available</p>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

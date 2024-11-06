@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { fetchEventsapi } from "../api/events";
+import { fetchEventpapi } from "../api/public";
 
 const EventContext = createContext();
 
@@ -13,7 +13,7 @@ export const EventProvider = ({ children }) => {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const data = await fetchEventsapi();
+      const data = await fetchEventpapi();
       setEvents(data);
       setError("");
     } catch (error) {

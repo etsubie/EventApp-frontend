@@ -38,14 +38,11 @@ export function Register() {
 
         // Navigate based on role
         switch (data.role) {
-          case "admin":
-            navigate("/admin/overview");
-            break;
           case "host":
             navigate("/host/events");
             break;
           case "attendee":
-            navigate("/events");
+            navigate("/");
             break;
           default:
             console.error("Unknown role:", data.role);
